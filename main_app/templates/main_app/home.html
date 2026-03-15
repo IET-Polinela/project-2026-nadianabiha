@@ -1,0 +1,102 @@
+﻿<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home | main_app</title>
+    <style>
+        :root {
+            --blue-50: #f5f9ff;
+            --blue-100: #e3efff;
+            --blue-200: #cfe0ff;
+            --blue-400: #7fb0ff;
+            --blue-600: #3f7fff;
+            --pink-100: #ffe6f3;
+            --pink-200: #ffd2ea;
+            --pink-300: #ffb6da;
+            --ink: #1a2b4c;
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--ink);
+            background:
+                radial-gradient(900px 500px at 10% 10%, rgba(255, 182, 218, 0.55), transparent 60%),
+                radial-gradient(800px 600px at 90% 20%, rgba(127, 176, 255, 0.55), transparent 55%),
+                linear-gradient(160deg, var(--blue-50), var(--pink-100));
+        }
+        .page {
+            display: grid;
+            place-items: center;
+            min-height: 100vh;
+            padding: 48px 20px;
+        }
+        .card {
+            width: min(860px, 92vw);
+            background: rgba(255, 255, 255, 0.7);
+            border: 1px solid rgba(127, 176, 255, 0.35);
+            border-radius: 20px;
+            padding: 36px 32px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 22px 60px rgba(64, 89, 140, 0.22);
+        }
+        .badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 999px;
+            font-size: 12px;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--blue-600);
+            background: rgba(127, 176, 255, 0.2);
+            border: 1px solid rgba(255, 182, 218, 0.6);
+        }
+        h1 {
+            margin: 18px 0 8px;
+            font-size: clamp(28px, 4vw, 44px);
+        }
+        p {
+            margin: 0 0 18px;
+            color: rgba(26, 43, 76, 0.8);
+            line-height: 1.7;
+        }
+        .nav {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 18px;
+        }
+        .nav a {
+            text-decoration: none;
+            color: #ffffff;
+            padding: 10px 16px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--blue-600), var(--pink-300));
+            border: 1px solid rgba(127, 176, 255, 0.45);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .nav a:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px rgba(64, 89, 140, 0.25);
+        }
+    </style>
+</head>
+<body>
+    <div class="page">
+        <main class="card">
+            <span class="badge">Main App</span>
+            <h1>Selamat Datang di kota Bandar Lampung.</h1>
+            <p>Selamat Datang Di HOME.</p>
+            <nav class="nav">
+                <a href="/">Home</a>
+                <a href="/about/">About</a>
+                <a href="/contacts/">Contacts</a>
+            </nav>
+        </main>
+    </div>
+</body>
+</html>

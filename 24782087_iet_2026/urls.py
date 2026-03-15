@@ -1,14 +1,8 @@
-from django.http import HttpResponse
-from django.urls import path
-from django.views.debug import default_urlconf
-
-
-def welcome(request):
-    return HttpResponse("Selamat Datang")
+from django.urls import include, path
 
 
 urlpatterns = [
-    path("", default_urlconf),
-    path("welcome", welcome),
-    path("welcome/", welcome),
+    path("", include("main_app.urls")),
+    path("about/", include("about.urls")),
+    path("contacts/", include("contacts.urls")),
 ]
