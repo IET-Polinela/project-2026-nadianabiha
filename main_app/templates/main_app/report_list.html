@@ -1,0 +1,37 @@
+<h2>Daftar Laporan</h2>
+
+{% if reports %}
+<table border="1" cellpadding="8" cellspacing="0">
+    <thead>
+        <tr>
+            <th>Pelapor</th>
+            <th>Judul</th>
+            <th>Kategori</th>
+            <th>Deskripsi</th>
+            <th>Lokasi</th>
+            <th>Status</th>
+            <th>Tanggal</th>
+            <th>Aksi</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for report in reports %}
+        <tr>
+            <td>{{ report.reporter_name }}</td>
+            <td>{{ report.title }}</td>
+            <td>{{ report.category }}</td>
+            <td>{{ report.description }}</td>
+            <td>{{ report.location }}</td>
+            <td>{{ report.status }}</td>
+            <td>{{ report.Created_at }}</td>
+            <td>
+                <a href="{% url 'update_report' report.id %}">Ubah</a>
+                <a href="{% url 'delete_report' report.id %}">Hapus</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>Belum ada laporan.</p>
+{% endif %}
