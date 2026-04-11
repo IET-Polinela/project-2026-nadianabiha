@@ -1,19 +1,18 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hapus Laporan</title>
-</head>
-<body>
-    <h1>Hapus Laporan</h1>
-    <p>Apakah kamu yakin ingin menghapus laporan "{{ report.title }}"?</p>
+{% extends "main_app/base.html" %}
 
-    <form method="post">
-        {% csrf_token %}
-        <button type="submit">Ya, Hapus</button>
-    </form>
+{% block title %}Hapus Laporan{% endblock %}
 
-    <p><a href="{% url 'home' %}">Batal</a></p>
-</body>
-</html>
+{% block content %}
+<section class="confirm-card">
+    <h2 class="confirm-title">Hapus Laporan</h2>
+    <p>Laporan <strong>"{{ report.title }}"</strong> akan dihapus permanen dari daftar. Pastikan data ini memang tidak lagi dibutuhkan.</p>
+
+    <div class="form-actions">
+        <form class="inline-form" method="post">
+            {% csrf_token %}
+            <button class="btn-danger" type="submit">Ya, Hapus</button>
+        </form>
+        <a class="btn btn-secondary" href="{% url 'report_list' %}">Batal</a>
+    </div>
+</section>
+{% endblock %}

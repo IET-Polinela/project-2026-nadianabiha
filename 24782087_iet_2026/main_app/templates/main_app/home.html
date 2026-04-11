@@ -1,17 +1,15 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home</title>
-</head>
-<body>
-    <h1>Smart City Issue Reporting</h1>
-    <p>Aplikasi sederhana untuk mencatat laporan permasalahan kota.</p>
-    <p>
-        <a href="{% url 'add_report' %}">Tambah Laporan</a>
-    </p>
+{% extends "main_app/base.html" %}
 
-    {% include "main_app/report_list.html" %}
-</body>
-</html>
+{% block title %}Daftar Laporan{% endblock %}
+
+{% block content %}
+<section class="section-head">
+    <div>
+        <h2>Daftar Laporan Warga</h2>
+        <p>Semua laporan ditampilkan dalam satu dashboard agar mudah dipantau dan diproses sesuai alur workflow.</p>
+    </div>
+    <a class="btn btn-secondary" href="{% url 'add_report' %}">Buat Laporan Baru</a>
+</section>
+
+{% include "main_app/report_list.html" %}
+{% endblock %}

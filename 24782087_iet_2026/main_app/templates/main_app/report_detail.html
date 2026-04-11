@@ -1,0 +1,53 @@
+{% extends "main_app/base.html" %}
+
+{% block title %}Detail Laporan{% endblock %}
+
+{% block content %}
+<section class="section-head">
+    <div>
+        <h2>Detail Laporan</h2>
+        <p>Lihat informasi laporan secara lengkap beserta status workflow yang sedang berjalan.</p>
+    </div>
+    <span class="status-badge status-{{ report.status|lower|slugify }}">{{ report.get_status_display }}</span>
+</section>
+
+<section class="detail-grid">
+    <article class="detail-item">
+        <p class="detail-label">Pelapor</p>
+        <p class="detail-value">{{ report.reporter_name }}</p>
+    </article>
+    <article class="detail-item">
+        <p class="detail-label">Kategori</p>
+        <p class="detail-value">{{ report.category }}</p>
+    </article>
+    <article class="detail-item detail-item-wide">
+        <p class="detail-label">Judul</p>
+        <p class="detail-value"><strong>{{ report.title }}</strong></p>
+    </article>
+    <article class="detail-item detail-item-wide">
+        <p class="detail-label">Deskripsi</p>
+        <p class="detail-value">{{ report.description }}</p>
+    </article>
+    <article class="detail-item">
+        <p class="detail-label">Lokasi</p>
+        <p class="detail-value">{{ report.location }}</p>
+    </article>
+    <article class="detail-item">
+        <p class="detail-label">Dibuat Pada</p>
+        <p class="detail-value">{{ report.created_at|date:"d M Y H:i" }}</p>
+    </article>
+</section>
+
+<div class="form-actions">
+    {% if report.next_status %}
+    <form class="inline-form" method="post" action="{% url 'update_report_status' report.id %}">
+        {% csrf_token %}
+        <input type="hidden" name="status" value="{{ report.next_status }}">
+        <button type="submit">Ubah ke {{ report.next_status_label }}</button>
+    </form>
+    {% endif %}
+    <a class="btn btn-secondary" href="{% url 'update_report' report.id %}">Ubah</a>
+    <a class="btn btn-danger" href="{% url 'delete_report' report.id %}">Hapus</a>
+    <a class="btn btn-secondary" href="{% url 'report_list' %}">Kembali</a>
+</div>
+{% endblock %}

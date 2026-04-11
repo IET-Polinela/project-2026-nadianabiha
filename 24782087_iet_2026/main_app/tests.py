@@ -5,7 +5,7 @@ from .models import Report
 
 
 class ReportCrudTests(TestCase):
-    def test_home_page_shows_reports(self):
+    def test_report_list_page_shows_reports(self):
         report = Report.objects.create(
             reporter_name="Nabiha",
             title="Lampu jalan mati",
@@ -14,7 +14,7 @@ class ReportCrudTests(TestCase):
             location="Jl. Sudirman",
         )
 
-        response = self.client.get(reverse("home"))
+        response = self.client.get(reverse("report_list"))
 
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, report.title)
@@ -31,7 +31,7 @@ class ReportCrudTests(TestCase):
             },
         )
 
-        self.assertRedirects(response, reverse("home"))
+        self.assertRedirects(response, reverse("report_list"))
         self.assertEqual(Report.objects.count(), 1)
         self.assertEqual(Report.objects.get().reporter_name, "Nabiha")
 
@@ -52,16 +52,15 @@ class ReportCrudTests(TestCase):
                 "category": "Lingkungan",
                 "description": "Air meluap saat hujan deras dan menutup jalan.",
                 "location": "Jl. Melati",
-                "status": Report.STATUS_IN_PROGRESS,
             },
         )
 
         report.refresh_from_db()
 
-        self.assertRedirects(response, reverse("home"))
+        self.assertRedirects(response, reverse("report_list"))
         self.assertEqual(report.reporter_name, "Nabiha")
         self.assertEqual(report.title, "Selokan tersumbat parah")
-        self.assertEqual(report.status, Report.STATUS_IN_PROGRESS)
+        self.assertEqual(report.status, Report.STATUS_REPORTED)
 
     def test_delete_report_removes_record(self):
         report = Report.objects.create(
@@ -74,5 +73,24 @@ class ReportCrudTests(TestCase):
 
         response = self.client.post(reverse("delete_report", args=[report.id]))
 
-        self.assertRedirects(response, reverse("home"))
+        self.assertRedirects(response, reverse("report_list"))
         self.assertFalse(Report.objects.filter(id=report.id).exists())
+
+    def test_update_status_advances_workflow(self):
+        report = Report.objects.create(
+            reporter_name="Sari",
+            title="Lampu taman mati",
+            category="Fasilitas umum",
+            description="Lampu taman padam total.",
+            location="Taman Kota",
+        )
+
+        response = self.client.post(
+            reverse("update_report_status", args=[report.id]),
+            {"status": Report.STATUS_VERIFIED},
+        )
+
+        report.refresh_from_db()
+
+        self.assertRedirects(response, reverse("report_list"))
+        self.assertEqual(report.status, Report.STATUS_VERIFIED)

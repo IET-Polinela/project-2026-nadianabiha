@@ -34,7 +34,7 @@ class ReportForm(forms.ModelForm):
 class ReportUpdateForm(forms.ModelForm):
     class Meta:
         model = Report
-        fields = ["reporter_name", "title", "category", "description", "location", "status"]
+        fields = ["reporter_name", "title", "category", "description", "location"]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -56,7 +56,4 @@ class ReportUpdateForm(forms.ModelForm):
         )
         self.fields["location"].widget.attrs.update(
             {"class": "form-control", "placeholder": "Masukkan lokasi kejadian"}
-        )
-        self.fields["status"].widget.attrs.update(
-            {"class": "form-control", "placeholder": "Contoh: REPORTED"}
         )

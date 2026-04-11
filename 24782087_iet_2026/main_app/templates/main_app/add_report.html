@@ -1,19 +1,23 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ page_title }}</title>
-</head>
-<body>
-    <h1>{{ heading }}</h1>
+{% extends "main_app/base.html" %}
 
+{% block title %}{{ page_title }}{% endblock %}
+
+{% block content %}
+<section class="section-head">
+    <div>
+        <h2>{{ heading }}</h2>
+        <p>Isi data laporan dengan lengkap agar proses verifikasi dan tindak lanjut berjalan lebih cepat.</p>
+    </div>
+</section>
+
+<section class="form-card">
     <form method="post">
         {% csrf_token %}
         {{ form.as_p }}
-        <button type="submit">{{ submit_label }}</button>
+        <div class="form-actions">
+            <button type="submit">{{ submit_label }}</button>
+            <a class="btn btn-secondary" href="{% url 'report_list' %}">Kembali ke daftar laporan</a>
+        </div>
     </form>
-
-    <p><a href="{% url 'home' %}">Kembali ke daftar laporan</a></p>
-</body>
-</html>
+</section>
+{% endblock %}

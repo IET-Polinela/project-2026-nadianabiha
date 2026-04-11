@@ -1,37 +1,59 @@
-<h2>Daftar Laporan</h2>
-
 {% if reports %}
-<table border="1" cellpadding="8" cellspacing="0">
-    <thead>
-        <tr>
-            <th>Pelapor</th>
-            <th>Judul</th>
-            <th>Kategori</th>
-            <th>Deskripsi</th>
-            <th>Lokasi</th>
-            <th>Status</th>
-            <th>Tanggal</th>
-            <th>Aksi</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for report in reports %}
-        <tr>
-            <td>{{ report.reporter_name }}</td>
-            <td>{{ report.title }}</td>
-            <td>{{ report.category }}</td>
-            <td>{{ report.description }}</td>
-            <td>{{ report.location }}</td>
-            <td>{{ report.status }}</td>
-            <td>{{ report.Created_at }}</td>
-            <td>
-                <a href="{% url 'update_report' report.id %}">Ubah</a>
-                <a href="{% url 'delete_report' report.id %}">Hapus</a>
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+<div class="report-table-wrap">
+    <table class="report-table">
+        <thead>
+            <tr>
+                <th>Pelapor</th>
+                <th>Judul</th>
+                <th>Kategori</th>
+                <th>Deskripsi</th>
+                <th>Lokasi</th>
+                <th>Status</th>
+                <th>Tanggal</th>
+                <th>Workflow</th>
+                <th>Aksi</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for report in reports %}
+            <tr>
+                <td>{{ report.reporter_name }}</td>
+                <td class="table-title">
+                    <strong>{{ report.title }}</strong>
+                    <span class="table-meta">Laporan warga</span>
+                </td>
+                <td>{{ report.category }}</td>
+                <td class="description-text">{{ report.description }}</td>
+                <td>{{ report.location }}</td>
+                <td>
+                    <span class="status-badge status-{{ report.status|lower|slugify }}">{{ report.get_status_display }}</span>
+                </td>
+                <td>{{ report.created_at|date:"d M Y H:i" }}</td>
+                <td>
+                    {% if report.next_status %}
+                    <form class="inline-form" method="post" action="{% url 'update_report_status' report.id %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="status" value="{{ report.next_status }}">
+                        <button type="submit">Ubah ke {{ report.next_status_label }}</button>
+                    </form>
+                    {% else %}
+                    <span class="status-badge status-resolved">Selesai</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <div class="action-group">
+                        <a class="btn btn-secondary" href="{% url 'report_detail' report.id %}">Detail</a>
+                        <a class="btn btn-secondary" href="{% url 'update_report' report.id %}">Ubah</a>
+                        <a class="btn btn-danger" href="{% url 'delete_report' report.id %}">Hapus</a>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
 {% else %}
-<p>Belum ada laporan.</p>
+<div class="empty-state">
+    <p>Belum ada laporan. Mulai dengan membuat laporan baru agar dashboard ini terisi.</p>
+</div>
 {% endif %}

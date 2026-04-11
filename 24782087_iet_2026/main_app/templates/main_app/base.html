@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Smart City Issue Reporting{% endblock %}</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'main_app/css/style.css' %}">
+</head>
+<body>
+    <div class="page-shell">
+        <header class="site-header">
+            <div>
+                <p class="eyebrow">Lab Smart City</p>
+                <h1 class="site-title">Smart City Issue Reporting</h1>
+                <p class="site-subtitle">Kelola laporan warga dengan alur kerja yang jelas, rapi, dan mudah dipantau.</p>
+            </div>
+            <nav class="site-nav">
+                <a class="nav-link" href="{% url 'report_list' %}">Daftar Laporan</a>
+                <a class="nav-link nav-link-primary" href="{% url 'add_report' %}">Tambah Laporan</a>
+            </nav>
+        </header>
+
+        <main class="content-card">
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+</body>
+</html>
