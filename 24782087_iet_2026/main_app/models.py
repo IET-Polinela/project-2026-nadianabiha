@@ -43,5 +43,26 @@ class Report(models.Model):
             return ""
         return dict(self.STATUS_CHOICES)[self.next_status]
 
+    @property
+    def status_badge_class(self):
+        return {
+            self.STATUS_REPORTED: "secondary",
+            self.STATUS_VERIFIED: "primary",
+            self.STATUS_IN_PROGRESS: "warning",
+            self.STATUS_RESOLVED: "success",
+        }.get(self.status, "secondary")
+
+    @property
+    def next_status_button_class(self):
+        return {
+            self.STATUS_VERIFIED: "btn-primary",
+            self.STATUS_IN_PROGRESS: "btn-warning",
+            self.STATUS_RESOLVED: "btn-success",
+        }.get(self.next_status, "btn-secondary")
+
+    @property
+    def is_resolved(self):
+        return self.status == self.STATUS_RESOLVED
+
     def __str__(self):
         return self.title

@@ -1,53 +1,79 @@
-{% extends "main_app/base.html" %}
+{% extends "base.html" %}
 
 {% block title %}Detail Laporan{% endblock %}
 
+{% block breadcrumb %}
+<nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'report_list' %}">Reports</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Detail</li>
+    </ol>
+</nav>
+{% endblock %}
+
 {% block content %}
-<section class="section-head">
-    <div>
-        <h2>Detail Laporan</h2>
-        <p>Lihat informasi laporan secara lengkap beserta status workflow yang sedang berjalan.</p>
+<section class="card border-0 shadow-sm">
+    <div class="card-body p-4 p-lg-5">
+        <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-start gap-3 mb-4">
+            <div>
+                <p class="text-uppercase text-secondary small fw-semibold mb-2">Detail laporan</p>
+                <h2 class="h3 mb-2">{{ report.title }}</h2>
+                <p class="text-secondary mb-0">{{ report.category }} - {{ report.location }}</p>
+            </div>
+            <span class="badge rounded-pill text-bg-{{ report.status_badge_class }} px-3 py-2">{{ report.get_status_display }}</span>
+        </div>
+
+        <div class="row g-3 mb-4">
+            <div class="col-md-6">
+                <div class="detail-card">
+                    <div class="detail-label">Pelapor</div>
+                    <div class="fw-semibold">{{ report.reporter_name }}</div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="detail-card">
+                    <div class="detail-label">Dibuat pada</div>
+                    <div class="fw-semibold">{{ report.created_at|date:"d M Y H:i" }}</div>
+                </div>
+            </div>
+            <div class="col-12">
+                <div class="detail-card">
+                    <div class="detail-label">Deskripsi</div>
+                    <div>{{ report.description }}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="d-flex flex-wrap gap-2">
+            {% if report.next_status %}
+            <button
+                type="button"
+                class="btn {{ report.next_status_button_class }}"
+                data-bs-toggle="modal"
+                data-bs-target="#actionConfirmModal"
+                data-action="{% url 'update_report_status' report.id %}"
+                data-status="{{ report.next_status }}"
+                data-modal-title="Ubah status laporan"
+                data-modal-message="Status '{{ report.title }}' akan diubah menjadi {{ report.next_status_label }}. Lanjutkan?"
+            >
+                <i class="bi bi-arrow-repeat me-2"></i>{{ report.next_status_label }}
+            </button>
+            {% endif %}
+            <a class="btn btn-warning" href="{% url 'update_report' report.id %}">Edit</a>
+            <button
+                type="button"
+                class="btn btn-danger"
+                data-bs-toggle="modal"
+                data-bs-target="#actionConfirmModal"
+                data-action="{% url 'delete_report' report.id %}"
+                data-modal-title="Hapus laporan"
+                data-modal-message="Laporan '{{ report.title }}' akan dihapus. Tindakan ini tidak bisa dibatalkan."
+            >
+                Hapus
+            </button>
+            <a class="btn btn-outline-secondary" href="{% url 'report_list' %}">Kembali</a>
+        </div>
     </div>
-    <span class="status-badge status-{{ report.status|lower|slugify }}">{{ report.get_status_display }}</span>
 </section>
-
-<section class="detail-grid">
-    <article class="detail-item">
-        <p class="detail-label">Pelapor</p>
-        <p class="detail-value">{{ report.reporter_name }}</p>
-    </article>
-    <article class="detail-item">
-        <p class="detail-label">Kategori</p>
-        <p class="detail-value">{{ report.category }}</p>
-    </article>
-    <article class="detail-item detail-item-wide">
-        <p class="detail-label">Judul</p>
-        <p class="detail-value"><strong>{{ report.title }}</strong></p>
-    </article>
-    <article class="detail-item detail-item-wide">
-        <p class="detail-label">Deskripsi</p>
-        <p class="detail-value">{{ report.description }}</p>
-    </article>
-    <article class="detail-item">
-        <p class="detail-label">Lokasi</p>
-        <p class="detail-value">{{ report.location }}</p>
-    </article>
-    <article class="detail-item">
-        <p class="detail-label">Dibuat Pada</p>
-        <p class="detail-value">{{ report.created_at|date:"d M Y H:i" }}</p>
-    </article>
-</section>
-
-<div class="form-actions">
-    {% if report.next_status %}
-    <form class="inline-form" method="post" action="{% url 'update_report_status' report.id %}">
-        {% csrf_token %}
-        <input type="hidden" name="status" value="{{ report.next_status }}">
-        <button type="submit">Ubah ke {{ report.next_status_label }}</button>
-    </form>
-    {% endif %}
-    <a class="btn btn-secondary" href="{% url 'update_report' report.id %}">Ubah</a>
-    <a class="btn btn-danger" href="{% url 'delete_report' report.id %}">Hapus</a>
-    <a class="btn btn-secondary" href="{% url 'report_list' %}">Kembali</a>
-</div>
 {% endblock %}

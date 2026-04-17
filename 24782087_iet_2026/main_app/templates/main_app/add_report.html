@@ -1,23 +1,47 @@
-{% extends "main_app/base.html" %}
+{% extends "base.html" %}
 
 {% block title %}{{ page_title }}{% endblock %}
 
-{% block content %}
-<section class="section-head">
-    <div>
-        <h2>{{ heading }}</h2>
-        <p>Isi data laporan dengan lengkap agar proses verifikasi dan tindak lanjut berjalan lebih cepat.</p>
-    </div>
-</section>
+{% block breadcrumb %}
+<nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'report_list' %}">Reports</a></li>
+        <li class="breadcrumb-item active" aria-current="page">{{ heading }}</li>
+    </ol>
+</nav>
+{% endblock %}
 
-<section class="form-card">
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <div class="form-actions">
-            <button type="submit">{{ submit_label }}</button>
-            <a class="btn btn-secondary" href="{% url 'report_list' %}">Kembali ke daftar laporan</a>
+{% block content %}
+<section class="card border-0 shadow-sm form-shell">
+    <div class="card-body p-4 p-lg-5">
+        <div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-4">
+            <div>
+                <h2 class="h3 mb-2">{{ heading }}</h2>
+                <p class="text-secondary mb-0">Gunakan form Bootstrap agar setiap field memiliki label yang jelas dan mudah diisi.</p>
+            </div>
+            <span class="badge text-bg-light border text-dark px-3 py-2">Form laporan</span>
         </div>
-    </form>
+        <form method="post">
+            {% csrf_token %}
+            {% for field in form %}
+            <div class="mb-3">
+                <label class="form-label fw-semibold" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+                {% if field.errors %}
+                <div class="text-danger small mt-1">{{ field.errors|join:", " }}</div>
+                {% endif %}
+            </div>
+            {% endfor %}
+            <div class="d-flex flex-wrap gap-2 mt-4">
+                <button type="submit" class="btn btn-primary js-submit-feedback" data-loading-text="Menyimpan...">
+                    <i class="bi bi-check-circle me-2"></i>{{ submit_label }}
+                </button>
+                <a class="btn btn-outline-secondary" href="{% url 'report_list' %}">
+                    <i class="bi bi-arrow-left me-2"></i>Kembali
+                </a>
+            </div>
+        </form>
+    </div>
 </section>
 {% endblock %}

@@ -1,18 +1,30 @@
-{% extends "main_app/base.html" %}
+{% extends "base.html" %}
 
 {% block title %}Hapus Laporan{% endblock %}
 
-{% block content %}
-<section class="confirm-card">
-    <h2 class="confirm-title">Hapus Laporan</h2>
-    <p>Laporan <strong>"{{ report.title }}"</strong> akan dihapus permanen dari daftar. Pastikan data ini memang tidak lagi dibutuhkan.</p>
+{% block breadcrumb %}
+<nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'report_list' %}">Reports</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Hapus</li>
+    </ol>
+</nav>
+{% endblock %}
 
-    <div class="form-actions">
-        <form class="inline-form" method="post">
+{% block content %}
+<section class="card border-0 shadow-sm">
+    <div class="card-body p-4 text-center">
+        <div class="confirm-icon mx-auto mb-3">
+            <i class="bi bi-trash"></i>
+        </div>
+        <h2 class="h3 mb-3">Hapus Laporan</h2>
+        <p class="text-secondary mb-4">Laporan <strong>{{ report.title }}</strong> akan dihapus permanen dari daftar laporan.</p>
+        <form method="post" class="d-flex justify-content-center gap-2 flex-wrap">
             {% csrf_token %}
-            <button class="btn-danger" type="submit">Ya, Hapus</button>
+            <button class="btn btn-danger js-submit-feedback" type="submit" data-loading-text="Menghapus...">Ya, Hapus</button>
+            <a class="btn btn-outline-secondary" href="{% url 'report_list' %}">Batal</a>
         </form>
-        <a class="btn btn-secondary" href="{% url 'report_list' %}">Batal</a>
     </div>
 </section>
 {% endblock %}

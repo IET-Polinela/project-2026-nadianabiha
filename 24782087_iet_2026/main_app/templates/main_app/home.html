@@ -1,15 +1,98 @@
-{% extends "main_app/base.html" %}
+{% extends "base.html" %}
 
-{% block title %}Daftar Laporan{% endblock %}
+{% block title %}Home | Teknologi Informasi{% endblock %}
+
+{% block hero %}
+<div class="row align-items-center g-4">
+    <div class="col-lg-7">
+        <p class="hero-kicker mb-2">Dashboard Utama</p>
+        <h1 class="display-5 fw-bold mb-3">Pantau laporan warga dan lanjutkan penanganannya dari satu dashboard.</h1>
+        <p class="lead text-secondary mb-4">Tampilan utama dibuat ringkas dengan ringkasan data, akses cepat ke daftar laporan, dan kartu informasi yang mudah dibaca.</p>
+        <div class="d-flex flex-wrap gap-2">
+            <a class="btn btn-primary btn-lg shadow-sm" href="{% url 'report_list' %}">
+                <i class="bi bi-table me-2"></i>Lihat Daftar Laporan
+            </a>
+            <a class="btn btn-outline-light btn-lg text-primary border-primary-subtle bg-white" href="{% url 'add_report' %}">
+                <i class="bi bi-plus-circle me-2"></i>Tambah Laporan
+            </a>
+        </div>
+    </div>
+    <div class="col-lg-5">
+        <div class="card border-0 shadow-sm stats-card">
+            <div class="card-body p-4">
+                <h2 class="h5 mb-3">Ringkasan Cepat</h2>
+                <div class="row g-3">
+                    <div class="col-4">
+                        <div class="metric-box">
+                            <span>Total</span>
+                            <strong>{{ total_reports }}</strong>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="metric-box">
+                            <span>Reported</span>
+                            <strong>{{ reported_count }}</strong>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="metric-box">
+                            <span>Resolved</span>
+                            <strong>{{ resolved_count }}</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
 
 {% block content %}
-<section class="section-head">
-    <div>
-        <h2>Daftar Laporan Warga</h2>
-        <p>Semua laporan ditampilkan dalam satu dashboard agar mudah dipantau dan diproses sesuai alur workflow.</p>
+<div class="row g-4">
+    <div class="col-lg-7">
+        <section class="card border-0 shadow-sm h-100">
+            <div class="card-body p-4">
+                <h2 class="h4 mb-3">Fitur Antarmuka</h2>
+                <div class="feature-list">
+                    <div class="feature-row">
+                        <i class="bi bi-signpost-split"></i>
+                        <span>Status laporan ditampilkan dengan badge yang mudah dibedakan.</span>
+                    </div>
+                    <div class="feature-row">
+                        <i class="bi bi-shield-check"></i>
+                        <span>Aksi dibatasi sesuai urutan workflow agar tidak salah proses.</span>
+                    </div>
+                    <div class="feature-row">
+                        <i class="bi bi-phone"></i>
+                        <span>Layout tetap nyaman saat dibuka di laptop maupun handphone.</span>
+                    </div>
+                </div>
+            </div>
+        </section>
     </div>
-    <a class="btn btn-secondary" href="{% url 'add_report' %}">Buat Laporan Baru</a>
-</section>
-
-{% include "main_app/report_list.html" %}
+    <div class="col-lg-5">
+        <section class="card border-0 shadow-sm h-100">
+            <div class="card-body p-4">
+                <h2 class="h4 mb-3">Aktivitas Terbaru</h2>
+                {% if latest_reports %}
+                    <div class="list-group list-group-flush">
+                        {% for report in latest_reports %}
+                        <a href="{% url 'report_detail' report.id %}" class="list-group-item list-group-item-action px-0">
+                            <div class="d-flex justify-content-between align-items-start gap-3">
+                                <div>
+                                    <div class="fw-semibold">{{ report.title }}</div>
+                                    <small class="text-secondary">{{ report.location }}</small>
+                                </div>
+                                <span class="badge text-bg-{{ report.status_badge_class }}">{{ report.get_status_display }}</span>
+                            </div>
+                        </a>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-secondary mb-0">Belum ada laporan. Tambahkan laporan pertama untuk mulai mengisi dashboard.</p>
+                {% endif %}
+            </div>
+        </section>
+    </div>
+</div>
 {% endblock %}

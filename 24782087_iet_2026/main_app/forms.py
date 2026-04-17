@@ -10,25 +10,15 @@ class ReportForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["reporter_name"].widget.attrs.update(
-            {"class": "form-control", "placeholder": "Masukkan nama pelapor"}
-        )
-        self.fields["title"].widget.attrs.update(
-            {"class": "form-control", "placeholder": "Masukkan judul laporan"}
-        )
-        self.fields["category"].widget.attrs.update(
-            {"class": "form-control", "placeholder": "Contoh: Jalan rusak"}
-        )
+        for field in self.fields.values():
+            field.widget.attrs["class"] = "form-control"
+        self.fields["reporter_name"].widget.attrs["placeholder"] = "Masukkan nama pelapor"
+        self.fields["title"].widget.attrs["placeholder"] = "Masukkan judul laporan"
+        self.fields["category"].widget.attrs["placeholder"] = "Contoh: Jalan rusak"
         self.fields["description"].widget.attrs.update(
-            {
-                "class": "form-control",
-                "rows": 5,
-                "placeholder": "Jelaskan permasalahan yang ingin dilaporkan",
-            }
+            {"rows": 5, "placeholder": "Jelaskan permasalahan yang ingin dilaporkan"}
         )
-        self.fields["location"].widget.attrs.update(
-            {"class": "form-control", "placeholder": "Masukkan lokasi kejadian"}
-        )
+        self.fields["location"].widget.attrs["placeholder"] = "Masukkan lokasi kejadian"
 
 
 class ReportUpdateForm(forms.ModelForm):
@@ -38,22 +28,12 @@ class ReportUpdateForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["reporter_name"].widget.attrs.update(
-            {"class": "form-control", "placeholder": "Masukkan nama pelapor"}
-        )
-        self.fields["title"].widget.attrs.update(
-            {"class": "form-control", "placeholder": "Masukkan judul laporan"}
-        )
-        self.fields["category"].widget.attrs.update(
-            {"class": "form-control", "placeholder": "Contoh: Jalan rusak"}
-        )
+        for field in self.fields.values():
+            field.widget.attrs["class"] = "form-control"
+        self.fields["reporter_name"].widget.attrs["placeholder"] = "Masukkan nama pelapor"
+        self.fields["title"].widget.attrs["placeholder"] = "Masukkan judul laporan"
+        self.fields["category"].widget.attrs["placeholder"] = "Contoh: Jalan rusak"
         self.fields["description"].widget.attrs.update(
-            {
-                "class": "form-control",
-                "rows": 5,
-                "placeholder": "Jelaskan permasalahan yang ingin dilaporkan",
-            }
+            {"rows": 5, "placeholder": "Jelaskan permasalahan yang ingin dilaporkan"}
         )
-        self.fields["location"].widget.attrs.update(
-            {"class": "form-control", "placeholder": "Masukkan lokasi kejadian"}
-        )
+        self.fields["location"].widget.attrs["placeholder"] = "Masukkan lokasi kejadian"
