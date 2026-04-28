@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'main_app',
     'about',
     'contacts',
+    'usermanagement_24782087',
 ]
 
 MIDDLEWARE = [
@@ -79,7 +80,7 @@ WSGI_APPLICATION = '24782087_iet_2026.wsgi.application'
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.getenv("POSTGRES_DB", "smartcity_db"),
+        "NAME": os.getenv("POSTGRES_DB", "smartcity_lab6"),
         "USER": os.getenv("POSTGRES_USER", "postgres"),
         "PASSWORD": os.getenv("POSTGRES_PASSWORD", "nabiha"),
         "HOST": os.getenv("POSTGRES_HOST", "localhost"),
@@ -124,3 +125,8 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [BASE_DIR / 'main_app' / 'static']
+
+AUTH_USER_MODEL = 'usermanagement_24782087.User'
+LOGIN_URL = 'login'
+LOGIN_REDIRECT_URL = 'report_list'
+LOGOUT_REDIRECT_URL = 'home'

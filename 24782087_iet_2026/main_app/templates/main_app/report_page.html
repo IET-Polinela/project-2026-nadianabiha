@@ -3,29 +3,10 @@
 {% block title %}Daftar Laporan{% endblock %}
 
 {% block hero %}
-<div class="row align-items-center g-4">
-    <div class="col-lg-7">
-        <p class="hero-kicker mb-2">Pusat Laporan</p>
-        <h1 class="display-6 fw-bold mb-3">Semua laporan terkumpul dalam tabel yang rapi dan mudah ditindaklanjuti.</h1>
-        <p class="lead mb-0 text-secondary">Halaman ini fokus pada keterbacaan data, tombol aksi yang jelas, dan navigasi yang cepat untuk admin maupun pengguna.</p>
-    </div>
-    <div class="col-lg-5">
-        <div class="hero-panel compact-panel">
-            <div class="hero-panel-item">
-                <span>Tabel</span>
-                <strong>Judul, lokasi, status, aksi</strong>
-            </div>
-            <div class="hero-panel-item">
-                <span>Kontrol</span>
-                <strong>Detail, edit, hapus, update status</strong>
-            </div>
-        </div>
-    </div>
-</div>
 {% endblock %}
 
 {% block breadcrumb %}
-<nav aria-label="breadcrumb" class="mb-4">
+<nav aria-label="breadcrumb" class="mb-3">
     <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
         <li class="breadcrumb-item active" aria-current="page">Reports</li>
@@ -34,18 +15,19 @@
 {% endblock %}
 
 {% block content %}
-<section class="card border-0 shadow-sm mb-4">
-    <div class="card-body p-4">
-        <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3 mb-3">
-            <div>
+<section class="card border-0 shadow-sm mb-4 page-card report-page-card">
+    <div class="card-body">
+        <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3 mb-3 report-toolbar">
+            <div class="report-toolbar-copy">
                 <h2 class="h3 mb-1">Daftar Laporan</h2>
                 <p class="text-secondary mb-0">Gunakan halaman ini untuk memantau status laporan dan menjalankan aksi yang diperbolehkan sistem.</p>
             </div>
-            <div class="d-flex gap-2 flex-wrap">
-                <span class="badge rounded-pill text-bg-light border text-dark px-3 py-2">{{ reports|length }} laporan</span>
-                <a class="btn btn-primary" href="{% url 'add_report' %}">
+            <div class="d-flex gap-2 flex-wrap report-toolbar-actions">
+                {% if request.user.is_authenticated and request.user.is_admin %}
+                <a class="btn btn-primary btn-sm report-add-button" href="{% url 'add_report' %}">
                     <i class="bi bi-plus-circle me-2"></i>Tambah
                 </a>
+                {% endif %}
             </div>
         </div>
         {% include "main_app/report_list.html" %}

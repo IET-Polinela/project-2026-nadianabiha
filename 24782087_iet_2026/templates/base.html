@@ -4,15 +4,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{% block title %}Teknologi Informasi{% endblock %}</title>
+    <title>{% block title %}Smart City{% endblock %}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="{% static 'main_app/css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'main_app/css/style.css' %}?v=20260422-redblack">
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark shadow-sm sticky-top app-navbar">
         <div class="container">
-            <a class="navbar-brand fw-semibold" href="{% url 'home' %}">Teknologi Informasi</a>
+            <a class="navbar-brand fw-semibold" href="{% url 'home' %}">Smart City</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -30,40 +30,28 @@
                     <li class="nav-item">
                         <a class="nav-link {% if '/contacts/' in request.path %}active{% endif %}" href="{% url 'contacts' %}">Contact</a>
                     </li>
+                    {% if request.user.is_authenticated %}
+                    <li class="nav-item">
+                        <span class="nav-link nav-user-badge">Hi, {{ request.user.username }}</span>
+                    </li>
+                    <li class="nav-item">
+                        <form method="post" action="{% url 'logout' %}" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm nav-logout-btn nav-auth-btn">Logout</button>
+                        </form>
+                    </li>
+                    {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link {% if '/accounts/login/' in request.path %}active{% endif %}" href="{% url 'login' %}">Login</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="btn btn-sm btn-outline-light nav-auth-btn" href="{% url 'register' %}">Register</a>
+                    </li>
+                    {% endif %}
                 </ul>
             </div>
         </div>
     </nav>
-
-    <div class="hero-strip">
-        <div class="container py-4 py-md-5">
-            {% block hero %}
-            <div class="row align-items-center g-4">
-                <div class="col-lg-7">
-                    <p class="hero-kicker mb-2">IET City Platform</p>
-                    <h1 class="display-6 fw-bold mb-3">Pelaporan isu kota yang tertata, cepat dipahami, dan nyaman dipakai.</h1>
-                    <p class="lead mb-0 text-secondary">Setiap halaman dirancang agar pengguna mudah membaca status laporan, memilih aksi yang tersedia, dan tetap nyaman saat membuka dari layar kecil.</p>
-                </div>
-                <div class="col-lg-5">
-                    <div class="hero-panel">
-                        <div class="hero-panel-item">
-                            <span>Responsive</span>
-                            <strong>Desktop & Mobile</strong>
-                        </div>
-                        <div class="hero-panel-item">
-                            <span>Workflow</span>
-                            <strong>Reported to Resolved</strong>
-                        </div>
-                        <div class="hero-panel-item">
-                            <span>Feedback</span>
-                            <strong>Alert, confirm, loading</strong>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            {% endblock %}
-        </div>
-    </div>
 
     <div class="container mt-3">
         {% if messages %}
@@ -77,6 +65,7 @@
     </div>
 
     <main class="container pb-5">
+        {% block hero %}{% endblock %}
         {% block breadcrumb %}{% endblock %}
         {% block content %}{% endblock %}
     </main>

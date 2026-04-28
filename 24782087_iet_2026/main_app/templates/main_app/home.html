@@ -1,57 +1,65 @@
 {% extends "base.html" %}
 
-{% block title %}Home | Teknologi Informasi{% endblock %}
+{% block title %}Home | Smart City{% endblock %}
 
 {% block hero %}
-<div class="row align-items-center g-4">
-    <div class="col-lg-7">
-        <p class="hero-kicker mb-2">Dashboard Utama</p>
-        <h1 class="display-5 fw-bold mb-3">Pantau laporan warga dan lanjutkan penanganannya dari satu dashboard.</h1>
-        <p class="lead text-secondary mb-4">Tampilan utama dibuat ringkas dengan ringkasan data, akses cepat ke daftar laporan, dan kartu informasi yang mudah dibaca.</p>
-        <div class="d-flex flex-wrap gap-2">
-            <a class="btn btn-primary btn-lg shadow-sm" href="{% url 'report_list' %}">
+<section class="simple-hero mb-4">
+    <div class="row align-items-center g-4">
+        <div class="col-lg-7">
+            <p class="section-label mb-2">Dashboard Utama</p>
+            <h1 class="display-5 fw-bold mb-3">Kelola laporan warga dengan tampilan yang rapi dan mudah dipahami.</h1>
+            <p class="lead text-secondary mb-4">Gunakan dashboard ini untuk melihat ringkasan laporan, memantau status, dan membuka halaman penting dengan cepat.</p>
+            <div class="d-flex flex-wrap gap-2 hero-action-group">
+                <a class="btn btn-primary hero-action-btn" href="{% url 'report_list' %}">
                 <i class="bi bi-table me-2"></i>Lihat Daftar Laporan
-            </a>
-            <a class="btn btn-outline-light btn-lg text-primary border-primary-subtle bg-white" href="{% url 'add_report' %}">
+                </a>
+                {% if request.user.is_authenticated and request.user.is_admin %}
+                <a class="btn btn-outline-primary hero-action-btn" href="{% url 'add_report' %}">
                 <i class="bi bi-plus-circle me-2"></i>Tambah Laporan
-            </a>
+                </a>
+                {% elif not request.user.is_authenticated %}
+                <a class="btn btn-outline-primary hero-action-btn" href="{% url 'login' %}">
+                <i class="bi bi-box-arrow-in-right me-2"></i>Login
+                </a>
+                {% endif %}
+            </div>
         </div>
-    </div>
-    <div class="col-lg-5">
-        <div class="card border-0 shadow-sm stats-card">
-            <div class="card-body p-4">
-                <h2 class="h5 mb-3">Ringkasan Cepat</h2>
-                <div class="row g-3">
-                    <div class="col-4">
+        <div class="col-lg-5">
+            <div class="card page-card border-0 shadow-sm">
+                <div class="card-body">
+                    <h2 class="h5 mb-3">Ringkasan Cepat</h2>
+                    <div class="row g-3">
+                        <div class="col-4 col-md-4">
                         <div class="metric-box">
                             <span>Total</span>
                             <strong>{{ total_reports }}</strong>
                         </div>
-                    </div>
-                    <div class="col-4">
+                        </div>
+                        <div class="col-4 col-md-4">
                         <div class="metric-box">
                             <span>Reported</span>
                             <strong>{{ reported_count }}</strong>
                         </div>
-                    </div>
-                    <div class="col-4">
+                        </div>
+                        <div class="col-4 col-md-4">
                         <div class="metric-box">
                             <span>Resolved</span>
                             <strong>{{ resolved_count }}</strong>
+                        </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
+</section>
 {% endblock %}
 
 {% block content %}
 <div class="row g-4">
     <div class="col-lg-7">
-        <section class="card border-0 shadow-sm h-100">
-            <div class="card-body p-4">
+        <section class="card page-card border-0 shadow-sm h-100">
+            <div class="card-body">
                 <h2 class="h4 mb-3">Fitur Antarmuka</h2>
                 <div class="feature-list">
                     <div class="feature-row">
@@ -71,8 +79,8 @@
         </section>
     </div>
     <div class="col-lg-5">
-        <section class="card border-0 shadow-sm h-100">
-            <div class="card-body p-4">
+        <section class="card page-card border-0 shadow-sm h-100">
+            <div class="card-body">
                 <h2 class="h4 mb-3">Aktivitas Terbaru</h2>
                 {% if latest_reports %}
                     <div class="list-group list-group-flush">

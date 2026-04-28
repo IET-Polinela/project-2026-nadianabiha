@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}Login | Smart City{% endblock %}
+
+{% block breadcrumb %}
+<nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Login</li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+<section class="card border-0 shadow-sm form-shell auth-card mx-auto">
+    <div class="card-body p-4 p-lg-5">
+        <div class="text-center mb-4">
+            <span class="badge text-bg-light border text-dark px-3 py-2 mb-3">Authentication</span>
+            <h2 class="h3 mb-2">Login</h2>
+            <p class="text-secondary mb-0">Masuk untuk mengakses fitur sesuai role Anda.</p>
+        </div>
+        <form method="post">
+            {% csrf_token %}
+            {% if form.non_field_errors %}
+            <div class="alert alert-danger">{{ form.non_field_errors|join:", " }}</div>
+            {% endif %}
+            {% for field in form %}
+            <div class="mb-3">
+                <label class="form-label fw-semibold" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+                {% if field.errors %}
+                <div class="text-danger small mt-1">{{ field.errors|join:", " }}</div>
+                {% endif %}
+            </div>
+            {% endfor %}
+            <button type="submit" class="btn btn-primary w-100 js-submit-feedback" data-loading-text="Masuk...">
+                <i class="bi bi-box-arrow-in-right me-2"></i>Login
+            </button>
+        </form>
+        <p class="text-center text-secondary small mb-0 mt-4">
+            Belum punya akun? <a href="{% url 'register' %}">Daftar sebagai Citizen</a>
+        </p>
+    </div>
+</section>
+{% endblock %}
