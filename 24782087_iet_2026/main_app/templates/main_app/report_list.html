@@ -1,4 +1,3 @@
-{% if reports %}
 <div class="table-responsive d-none d-md-block">
     <table class="table table-hover align-middle report-table mb-0">
         <thead class="table-dark">
@@ -9,7 +8,7 @@
                 <th>Aksi</th>
             </tr>
         </thead>
-        <tbody>
+        <tbody id="reportTableBody">
             {% for report in reports %}
             <tr>
                 <td class="report-title-cell">
@@ -23,39 +22,39 @@
                 <td class="report-action-cell">
                     {% if request.user.is_authenticated and request.user.is_admin %}
                     <div class="report-admin-actions">
-                            {% if report.next_status %}
-                            <button
-                                type="button"
-                                class="btn btn-sm {{ report.next_status_button_class }} report-action-btn"
-                                data-bs-toggle="modal"
-                                data-bs-target="#actionConfirmModal"
-                                data-action="{% url 'update_report_status' report.id %}"
-                                data-status="{{ report.next_status }}"
-                                data-modal-title="Ubah status laporan"
-                                data-modal-message="Status '{{ report.title }}' akan diubah menjadi {{ report.next_status_label }}. Lanjutkan?"
-                            >
-                                {{ report.next_status_label }}
-                            </button>
-                            {% else %}
-                            <button type="button" class="btn btn-sm btn-outline-secondary report-action-btn" disabled>Final</button>
-                            {% endif %}
-                            <a class="btn btn-sm btn-info text-white report-action-btn" href="{% url 'report_detail' report.id %}">Detail</a>
-                            <a class="btn btn-sm btn-warning report-action-btn" href="{% url 'update_report' report.id %}">Edit</a>
-                            <button
-                                type="button"
-                                class="btn btn-sm btn-danger report-action-btn"
-                                data-bs-toggle="modal"
-                                data-bs-target="#actionConfirmModal"
-                                data-action="{% url 'delete_report' report.id %}"
-                                data-modal-title="Hapus laporan"
-                                data-modal-message="Laporan '{{ report.title }}' akan dihapus. Tindakan ini tidak bisa dibatalkan."
-                            >
-                                Hapus
-                            </button>
+                        {% if report.next_status %}
+                        <button
+                            type="button"
+                            class="btn btn-sm {{ report.next_status_button_class }} report-action-btn"
+                            data-bs-toggle="modal"
+                            data-bs-target="#actionConfirmModal"
+                            data-action="{% url 'update_report_status' report.id %}"
+                            data-status="{{ report.next_status }}"
+                            data-modal-title="Ubah status laporan"
+                            data-modal-message="Status '{{ report.title }}' akan diubah menjadi {{ report.next_status_label }}. Lanjutkan?"
+                        >
+                            {{ report.next_status_label }}
+                        </button>
+                        {% else %}
+                        <button type="button" class="btn btn-sm btn-outline-secondary report-action-btn" disabled>Final</button>
+                        {% endif %}
+                        <button type="button" class="btn btn-sm btn-info report-action-btn js-detail-trigger" data-detail-url="{% url 'report_detail_json' report.id %}">Detail</button>
+                        <a class="btn btn-sm btn-warning report-action-btn" href="{% url 'update_report' report.id %}">Edit</a>
+                        <button
+                            type="button"
+                            class="btn btn-sm btn-danger report-action-btn"
+                            data-bs-toggle="modal"
+                            data-bs-target="#actionConfirmModal"
+                            data-action="{% url 'delete_report' report.id %}"
+                            data-modal-title="Hapus laporan"
+                            data-modal-message="Laporan '{{ report.title }}' akan dihapus. Tindakan ini tidak bisa dibatalkan."
+                        >
+                            Hapus
+                        </button>
                     </div>
                     {% else %}
                     <div class="report-citizen-actions">
-                        <a class="btn btn-sm btn-info text-white report-action-btn" href="{% url 'report_detail' report.id %}">Detail</a>
+                        <button type="button" class="btn btn-sm btn-info report-action-btn js-detail-trigger" data-detail-url="{% url 'report_detail_json' report.id %}">Detail</button>
                     </div>
                     {% endif %}
                 </td>
@@ -64,7 +63,8 @@
         </tbody>
     </table>
 </div>
-<div class="d-grid gap-3 d-md-none">
+
+<div id="mobileReportList" class="d-grid gap-3 d-md-none">
     {% for report in reports %}
     <article class="mobile-report-card">
         <div class="mobile-report-card__head">
@@ -102,7 +102,7 @@
                 {% else %}
                 <button type="button" class="btn btn-sm btn-outline-secondary mobile-action-btn" disabled>Final</button>
                 {% endif %}
-                <a class="btn btn-sm btn-info text-white mobile-action-btn" href="{% url 'report_detail' report.id %}">Detail</a>
+                <button type="button" class="btn btn-sm btn-info mobile-action-btn js-detail-trigger" data-detail-url="{% url 'report_detail_json' report.id %}">Detail</button>
                 <a class="btn btn-sm btn-warning mobile-action-btn" href="{% url 'update_report' report.id %}">Edit</a>
                 <button
                     type="button"
@@ -116,21 +116,20 @@
                     Hapus
                 </button>
             {% else %}
-                <a class="btn btn-sm btn-info text-white mobile-action-btn" href="{% url 'report_detail' report.id %}">Detail</a>
+                <button type="button" class="btn btn-sm btn-info mobile-action-btn js-detail-trigger" data-detail-url="{% url 'report_detail_json' report.id %}">Detail</button>
             {% endif %}
         </div>
     </article>
     {% endfor %}
 </div>
-{% else %}
-<div class="empty-state text-center py-5 px-4">
+
+<div id="reportEmptyState" class="empty-state text-center py-5 px-4 {% if reports %}d-none{% endif %}">
     <div class="empty-state-icon mb-3">
         <i class="bi bi-inboxes"></i>
     </div>
-    <h3 class="h4">Belum ada laporan</h3>
-    <p class="text-secondary mb-4">Data laporan masih kosong. Tambahkan laporan pertama agar tabel laporan mulai terisi.</p>
+    <h3 id="reportEmptyTitle" class="h4">Belum ada laporan</h3>
+    <p id="reportEmptyText" class="text-secondary mb-4">Data laporan masih kosong. Tambahkan laporan pertama agar tabel laporan mulai terisi.</p>
     <a class="btn btn-primary" href="{% url 'add_report' %}">
         <i class="bi bi-plus-circle me-2"></i>Tambah laporan
     </a>
 </div>
-{% endif %}

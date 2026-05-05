@@ -30,7 +30,243 @@
                 {% endif %}
             </div>
         </div>
+        <div class="row g-3 align-items-end mb-4">
+            <div class="col-lg-7">
+                <label for="liveSearchInput" class="form-label fw-semibold">Live Search</label>
+                <input
+                    type="search"
+                    id="liveSearchInput"
+                    class="form-control"
+                    placeholder="Cari judul, kategori, lokasi, atau nama pelapor..."
+                    autocomplete="off"
+                >
+            </div>
+            <div class="col-lg-5">
+                <div class="detail-card h-100 d-flex align-items-center justify-content-between gap-3">
+                    <div>
+                        <div class="detail-label mb-1">Status Pencarian</div>
+                        <div id="liveSearchStatus" class="fw-semibold">Menampilkan semua laporan.</div>
+                    </div>
+                    <button type="button" id="clearSearchButton" class="btn btn-outline-secondary btn-sm">Reset</button>
+                </div>
+            </div>
+        </div>
         {% include "main_app/report_list.html" %}
     </div>
 </section>
+
+<div class="modal fade" id="reportDetailModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header border-0 pb-0">
+                <div>
+                    <p class="text-uppercase small fw-semibold mb-1">Detail Laporan</p>
+                    <h5 class="modal-title" id="reportDetailModalTitle">Memuat...</h5>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body pt-3">
+                <div class="d-flex flex-wrap gap-2 align-items-center mb-3">
+                    <span id="reportDetailStatus" class="badge rounded-pill">Status</span>
+                    <span id="reportDetailCategory" class="badge text-bg-light">Kategori</span>
+                </div>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="detail-card">
+                            <div class="detail-label">Pelapor</div>
+                            <div id="reportDetailReporter" class="detail-value">-</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="detail-card">
+                            <div class="detail-label">Lokasi</div>
+                            <div id="reportDetailLocation" class="detail-value">-</div>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="detail-card">
+                            <div class="detail-label">Dibuat Pada</div>
+                            <div id="reportDetailCreatedAt" class="detail-value">-</div>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="detail-card">
+                            <div class="detail-label">Deskripsi</div>
+                            <div id="reportDetailDescription" class="detail-value">-</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    var searchInput = document.getElementById("liveSearchInput");
+    var clearButton = document.getElementById("clearSearchButton");
+    var searchStatus = document.getElementById("liveSearchStatus");
+    var tableBody = document.getElementById("reportTableBody");
+    var mobileList = document.getElementById("mobileReportList");
+    var emptyState = document.getElementById("reportEmptyState");
+    var emptyTitle = document.getElementById("reportEmptyTitle");
+    var emptyText = document.getElementById("reportEmptyText");
+    var detailModalElement = document.getElementById("reportDetailModal");
+    var detailModal = detailModalElement ? new bootstrap.Modal(detailModalElement) : null;
+    var debounceTimer;
+
+    function statusBadgeClass(name) {
+        return "text-bg-" + (name || "secondary");
+    }
+
+    function truncateText(text, length) {
+        if (!text) return "";
+        return text.length > length ? text.slice(0, length - 1) + "..." : text;
+    }
+
+    function adminActions(report) {
+        var statusButton = report.next_status
+            ? '<button type="button" class="btn btn-sm ' + report.next_status_button_class + ' report-action-btn" ' +
+                'data-bs-toggle="modal" data-bs-target="#actionConfirmModal" ' +
+                'data-action="' + report.status_url + '" ' +
+                'data-status="' + report.next_status + '" ' +
+                'data-modal-title="Ubah status laporan" ' +
+                'data-modal-message="Status \'' + report.title.replace(/'/g, "\\'") + '\' akan diubah menjadi ' + report.next_status_label + '. Lanjutkan?">' +
+                report.next_status_label +
+              '</button>'
+            : '<button type="button" class="btn btn-sm btn-outline-secondary report-action-btn" disabled>Final</button>';
+
+        return (
+            '<div class="report-admin-actions">' +
+            statusButton +
+            '<button type="button" class="btn btn-sm btn-info report-action-btn js-detail-trigger" data-detail-url="/reports/' + report.id + '/json/">Detail</button>' +
+            '<a class="btn btn-sm btn-warning report-action-btn" href="' + report.edit_url + '">Edit</a>' +
+            '<button type="button" class="btn btn-sm btn-danger report-action-btn" data-bs-toggle="modal" data-bs-target="#actionConfirmModal" ' +
+            'data-action="' + report.delete_url + '" data-modal-title="Hapus laporan" ' +
+            'data-modal-message="Laporan \'' + report.title.replace(/'/g, "\\'") + '\' akan dihapus. Tindakan ini tidak bisa dibatalkan.">Hapus</button>' +
+            '</div>'
+        );
+    }
+
+    function citizenActions(report) {
+        return '<div class="report-citizen-actions"><button type="button" class="btn btn-sm btn-info report-action-btn js-detail-trigger" data-detail-url="/reports/' + report.id + '/json/">Detail</button></div>';
+    }
+
+    function renderReports(data) {
+        if (!data.reports.length) {
+            tableBody.innerHTML = "";
+            mobileList.innerHTML = "";
+            emptyState.classList.remove("d-none");
+            if (data.query) {
+                searchStatus.textContent = 'Tidak ada hasil untuk "' + data.query + '".';
+                emptyTitle.textContent = "Hasil pencarian tidak ditemukan";
+                emptyText.textContent = 'Coba gunakan kata kunci lain yang sesuai dengan judul, kategori, lokasi, atau nama pelapor.';
+            } else {
+                searchStatus.textContent = "Belum ada laporan untuk ditampilkan.";
+                emptyTitle.textContent = "Belum ada laporan";
+                emptyText.textContent = "Data laporan masih kosong. Tambahkan laporan pertama agar tabel laporan mulai terisi.";
+            }
+            return;
+        }
+
+        emptyState.classList.add("d-none");
+        searchStatus.textContent = data.query
+            ? 'Menampilkan ' + data.reports.length + ' hasil untuk "' + data.query + '".'
+            : "Menampilkan semua laporan.";
+        emptyTitle.textContent = "Belum ada laporan";
+        emptyText.textContent = "Data laporan masih kosong. Tambahkan laporan pertama agar tabel laporan mulai terisi.";
+
+        tableBody.innerHTML = data.reports.map(function (report) {
+            return (
+                "<tr>" +
+                '<td class="report-title-cell"><div class="fw-semibold">' + report.title + '</div><small class="d-block">' + report.category + " - " + report.reporter_name + "</small></td>" +
+                '<td class="report-location-cell">' + report.location + "</td>" +
+                '<td class="report-status-cell"><span class="badge rounded-pill ' + statusBadgeClass(report.status_badge_class) + '">' + report.status_display + "</span></td>" +
+                '<td class="report-action-cell">' + (data.is_admin ? adminActions(report) : citizenActions(report)) + "</td>" +
+                "</tr>"
+            );
+        }).join("");
+
+        mobileList.innerHTML = data.reports.map(function (report) {
+            var actions = data.is_admin
+                ? (
+                    (report.next_status
+                        ? '<button type="button" class="btn btn-sm ' + report.next_status_button_class + ' mobile-action-btn" data-bs-toggle="modal" data-bs-target="#actionConfirmModal" data-action="' + report.status_url + '" data-status="' + report.next_status + '" data-modal-title="Ubah status laporan" data-modal-message="Status \'' + report.title.replace(/'/g, "\\'") + '\' akan diubah menjadi ' + report.next_status_label + '. Lanjutkan?">' + report.next_status_label + "</button>"
+                        : '<button type="button" class="btn btn-sm btn-outline-secondary mobile-action-btn" disabled>Final</button>'
+                    ) +
+                    '<button type="button" class="btn btn-sm btn-info mobile-action-btn js-detail-trigger" data-detail-url="/reports/' + report.id + '/json/">Detail</button>' +
+                    '<a class="btn btn-sm btn-warning mobile-action-btn" href="' + report.edit_url + '">Edit</a>' +
+                    '<button type="button" class="btn btn-sm btn-danger mobile-action-btn" data-bs-toggle="modal" data-bs-target="#actionConfirmModal" data-action="' + report.delete_url + '" data-modal-title="Hapus laporan" data-modal-message="Laporan \'' + report.title.replace(/'/g, "\\'") + '\' akan dihapus. Tindakan ini tidak bisa dibatalkan.">Hapus</button>'
+                )
+                : '<button type="button" class="btn btn-sm btn-info mobile-action-btn js-detail-trigger" data-detail-url="/reports/' + report.id + '/json/">Detail</button>';
+
+            return (
+                '<article class="mobile-report-card">' +
+                '<div class="mobile-report-card__head"><div><h3 class="mobile-report-card__title">' + report.title + '</h3><p class="mobile-report-card__meta">' + report.category + " - " + report.reporter_name + '</p></div><span class="badge rounded-pill ' + statusBadgeClass(report.status_badge_class) + '">' + report.status_display + "</span></div>" +
+                '<div class="mobile-report-card__body"><div class="mobile-report-card__item"><span class="mobile-report-card__label">Lokasi</span><span class="mobile-report-card__value">' + report.location + '</span></div><div class="mobile-report-card__item"><span class="mobile-report-card__label">Deskripsi</span><span class="mobile-report-card__value">' + truncateText(report.description, 90) + "</span></div></div>" +
+                '<div class="mobile-report-card__actions">' + actions + "</div></article>"
+            );
+        }).join("");
+    }
+
+    function fetchReports(query) {
+        fetch("{% url 'report_search' %}?q=" + encodeURIComponent(query || ""))
+            .then(function (response) { return response.json(); })
+            .then(function (data) {
+                console.log("Live Search JSON:", data);
+                renderReports(data);
+            })
+            .catch(function (error) {
+                console.error("Gagal mengambil data laporan:", error);
+                searchStatus.textContent = "Data gagal dimuat.";
+            });
+    }
+
+    if (searchInput) {
+        searchInput.addEventListener("input", function () {
+            clearTimeout(debounceTimer);
+            var query = this.value;
+            debounceTimer = setTimeout(function () {
+                fetchReports(query);
+            }, 350);
+        });
+    }
+
+    if (clearButton) {
+        clearButton.addEventListener("click", function () {
+            searchInput.value = "";
+            fetchReports("");
+            searchInput.focus();
+        });
+    }
+
+    document.addEventListener("click", function (event) {
+        var trigger = event.target.closest(".js-detail-trigger");
+        if (!trigger || !detailModal) {
+            return;
+        }
+
+        fetch(trigger.dataset.detailUrl)
+            .then(function (response) { return response.json(); })
+            .then(function (data) {
+                console.log("Detail JSON:", data);
+                document.getElementById("reportDetailModalTitle").textContent = data.title;
+                document.getElementById("reportDetailReporter").textContent = data.reporter_name;
+                document.getElementById("reportDetailLocation").textContent = data.location;
+                document.getElementById("reportDetailCreatedAt").textContent = data.created_at;
+                document.getElementById("reportDetailDescription").textContent = data.description;
+                document.getElementById("reportDetailCategory").textContent = data.category;
+
+                var statusBadge = document.getElementById("reportDetailStatus");
+                statusBadge.textContent = data.status_display;
+                statusBadge.className = "badge rounded-pill " + statusBadgeClass(data.status_badge_class);
+
+                detailModal.show();
+            })
+            .catch(function (error) {
+                console.error("Gagal mengambil detail laporan:", error);
+            });
+    });
+});
+</script>
 {% endblock %}

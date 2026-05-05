@@ -1,6 +1,8 @@
 from django.contrib import messages
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect
-from django.urls import reverse_lazy
+from django.db.models import Q
+from django.urls import reverse, reverse_lazy
 from django.views import View
 from django.views.generic import CreateView, DeleteView, DetailView, ListView, TemplateView, UpdateView
 
@@ -33,6 +35,71 @@ class ReportListView(ListView):
     model = Report
     template_name = "main_app/report_page.html"
     context_object_name = "reports"
+
+
+class ReportSearchAPIView(View):
+    def get(self, request, *args, **kwargs):
+        query = request.GET.get("q", "").strip()
+        reports = Report.objects.all()
+
+        if query:
+            reports = reports.filter(
+                Q(title__icontains=query)
+                | Q(category__icontains=query)
+                | Q(location__icontains=query)
+                | Q(reporter_name__icontains=query)
+                | Q(description__icontains=query)
+            )
+
+        reports = reports[:50]
+        is_admin = request.user.is_authenticated and getattr(request.user, "is_admin", False)
+
+        return JsonResponse(
+            {
+                "query": query,
+                "is_admin": is_admin,
+                "reports": [
+                    {
+                        "id": report.id,
+                        "title": report.title,
+                        "category": report.category,
+                        "reporter_name": report.reporter_name,
+                        "location": report.location,
+                        "description": report.description,
+                        "status": report.status,
+                        "status_display": report.get_status_display(),
+                        "status_badge_class": report.status_badge_class,
+                        "next_status": report.next_status,
+                        "next_status_label": report.next_status_label,
+                        "next_status_button_class": report.next_status_button_class,
+                        "detail_url": reverse("report_detail", kwargs={"pk": report.pk}),
+                        "edit_url": reverse("update_report", kwargs={"pk": report.pk}),
+                        "delete_url": reverse("delete_report", kwargs={"pk": report.pk}),
+                        "status_url": reverse("update_report_status", kwargs={"pk": report.pk}),
+                    }
+                    for report in reports
+                ],
+            }
+        )
+
+
+class ReportDetailAPIView(View):
+    def get(self, request, pk, *args, **kwargs):
+        report = get_object_or_404(Report, pk=pk)
+        return JsonResponse(
+            {
+                "id": report.id,
+                "title": report.title,
+                "category": report.category,
+                "reporter_name": report.reporter_name,
+                "location": report.location,
+                "description": report.description,
+                "status": report.status,
+                "status_display": report.get_status_display(),
+                "status_badge_class": report.status_badge_class,
+                "created_at": report.created_at.strftime("%d %B %Y %H:%M"),
+            }
+        )
 
 
 class ReportDetailView(DetailView):

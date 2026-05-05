@@ -1,0 +1,574 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard | Smart City{% endblock %}
+
+{% block breadcrumb %}
+<nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Dashboard</li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+<style>
+.dashboard-status-card {
+    background: linear-gradient(180deg, rgba(28, 31, 38, 0.96) 0%, rgba(20, 22, 28, 0.98) 100%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.28) !important;
+    border-radius: 24px !important;
+}
+
+.dashboard-status-card h2,
+.dashboard-status-card p,
+.dashboard-status-card span,
+.dashboard-status-card div {
+    color: #ffffff !important;
+}
+
+.dashboard-status-head {
+    margin-bottom: 1.15rem !important;
+    align-items: center !important;
+}
+
+.dashboard-kicker {
+    color: #93c5fd !important;
+    letter-spacing: 0.14em;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.dashboard-chip {
+    background: rgba(255,255,255,0.08) !important;
+    color: #e2e8f0 !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.16) !important;
+    border-radius: 999px !important;
+    min-width: 98px;
+    text-align: center;
+}
+
+.chart-shell {
+    position: relative;
+    min-height: 330px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+}
+
+.chart-shell-status {
+    padding: 0.35rem 0 0.2rem;
+}
+
+.chart-shell::before {
+    content: "";
+    position: absolute;
+    width: 300px;
+    height: 300px;
+    inset: 50% auto auto 50%;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(59,130,246,0.12) 0%, rgba(168,85,247,0.10) 40%, rgba(34,197,94,0.08) 62%, rgba(0,0,0,0) 76%);
+    filter: blur(18px);
+    pointer-events: none;
+}
+
+.status-chart-frame {
+    position: relative;
+    width: 300px;
+    height: 300px;
+    margin: 0 auto;
+    aspect-ratio: 1 / 1;
+    display: grid;
+    place-items: center;
+}
+
+.status-chart-legend {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.65rem 1.15rem;
+    max-width: 300px;
+    margin: 0 auto;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #e2e8f0 !important;
+}
+
+.status-chart-legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    line-height: 1;
+}
+
+.status-chart-legend-swatch {
+    width: 12px;
+    height: 12px;
+    border-radius: 4px;
+    border: 2px solid #ffffff;
+    box-shadow: 0 0 10px rgba(255,255,255,0.16);
+    flex: 0 0 12px;
+}
+
+.chart-center-indicator {
+    position: absolute;
+    inset: 50% auto auto 50%;
+    transform: translate(-50%, -50%);
+    width: 118px;
+    height: 118px;
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(circle at 30% 20%, rgba(44, 52, 66, 0.98), rgba(28, 33, 44, 0.9) 32%, rgba(18, 22, 30, 0.98) 100%);
+    border: 1px solid rgba(255,255,255,0.08);
+    box-shadow: inset 0 1px 10px rgba(255,255,255,0.04), 0 12px 28px rgba(0,0,0,0.26);
+    pointer-events: none;
+}
+
+.chart-center-value {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #ffffff !important;
+}
+
+.chart-center-label {
+    margin-top: 0.45rem;
+    font-size: 0.78rem;
+    color: rgba(226, 232, 240, 0.84) !important;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    text-align: center;
+}
+
+#statusChart {
+    width: 300px !important;
+    height: 300px !important;
+    max-width: 300px;
+    max-height: 300px;
+    margin: 0 auto;
+    display: block;
+    filter: drop-shadow(0 14px 26px rgba(0, 0, 0, 0.18));
+}
+
+@keyframes dashboardFadeUp {
+    from { opacity: 0; transform: translateY(18px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.dashboard-enter {
+    animation: dashboardFadeUp 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@media (max-width: 767.98px) {
+    .dashboard-status-card {
+        border-radius: 20px !important;
+    }
+
+    .dashboard-status-head {
+        gap: 0.75rem;
+        align-items: flex-start !important;
+    }
+
+    .chart-shell {
+        min-height: 330px;
+    }
+
+    .chart-shell::before {
+        width: 300px;
+        height: 300px;
+    }
+
+    .chart-center-indicator {
+        width: 106px;
+        height: 106px;
+        inset: 50% auto auto 50%;
+        transform: translate(-50%, -50%);
+    }
+
+    .chart-center-value {
+        font-size: 1.55rem;
+    }
+}
+</style>
+
+<section class="card border-0 shadow-sm page-card mb-4">
+    <div class="card-body p-4 p-lg-5">
+        <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3 mb-4">
+            <div>
+                <p class="text-uppercase small fw-semibold mb-2">Dashboard Statistik</p>
+                <h1 class="h2 mb-2">Visualisasi laporan warga</h1>
+                <p class="text-secondary mb-0">Data statistik ditarik secara dinamis menggunakan Fetch API dan divisualisasikan dengan Chart.js.</p>
+            </div>
+            <a href="{% url 'report_list' %}" class="btn btn-primary">
+                <i class="bi bi-table me-2"></i>Lihat Daftar Laporan
+            </a>
+        </div>
+
+        <div class="row g-4 mb-4">
+            <div class="col-lg-5">
+                <div class="detail-card h-100 dashboard-status-card dashboard-enter">
+                    <div class="d-flex justify-content-between align-items-center mb-3 dashboard-status-head">
+                        <div>
+                            <p class="dashboard-kicker mb-1">Status Distribution</p>
+                            <h2 class="h4 mb-0">Distribusi Status</h2>
+                        </div>
+                        <span class="badge dashboard-chip">Donut Chart</span>
+                    </div>
+                    <div class="chart-shell chart-shell-status">
+                        <div id="statusChartLegend" class="status-chart-legend"></div>
+                        <div class="status-chart-frame" style="width: 300px; height: 300px; margin: auto;">
+                            <canvas id="statusChart" width="300" height="300"></canvas>
+                            <div class="chart-center-indicator">
+                                <div id="statusChartPercent" class="chart-center-value">0%</div>
+                                <div id="statusChartLabel" class="chart-center-label">Reported</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-7">
+                <div class="detail-card h-100">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h2 class="h5 mb-0">Distribusi Kategori</h2>
+                        <span class="badge text-bg-light">Bar</span>
+                    </div>
+                    <canvas id="categoryChart" height="260"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-lg-6">
+                <div class="detail-card h-100">
+                    <h2 class="h5 mb-3">5 Laporan REPORTED Terbaru</h2>
+                    <div class="table-responsive">
+                        <table class="table align-middle mb-0 dashboard-mini-table">
+                            <thead>
+                                <tr>
+                                    <th>Judul</th>
+                                    <th>Lokasi</th>
+                                    <th>Waktu</th>
+                                </tr>
+                            </thead>
+                            <tbody id="latestReportedBody">
+                                <tr><td colspan="3" class="text-center">Memuat data...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="detail-card h-100">
+                    <h2 class="h5 mb-3">5 Laporan RESOLVED Terbaru</h2>
+                    <div class="table-responsive">
+                        <table class="table align-middle mb-0 dashboard-mini-table">
+                            <thead>
+                                <tr>
+                                    <th>Judul</th>
+                                    <th>Lokasi</th>
+                                    <th>Waktu</th>
+                                </tr>
+                            </thead>
+                            <tbody id="latestResolvedBody">
+                                <tr><td colspan="3" class="text-center">Memuat data...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    var statusCtx = document.getElementById("statusChart");
+    var categoryCtx = document.getElementById("categoryChart");
+    var reportedBody = document.getElementById("latestReportedBody");
+    var resolvedBody = document.getElementById("latestResolvedBody");
+    var statusPercentEl = document.getElementById("statusChartPercent");
+    var statusLabelEl = document.getElementById("statusChartLabel");
+    var statusLegendEl = document.getElementById("statusChartLegend");
+    var statusColors = ["#f59e0b", "#2563eb", "#7c3aed", "#16a34a"];
+    var statusChart;
+    var categoryChart;
+    function updateStatusCenter(labels, values, index, progress) {
+        var total = values.reduce(function (sum, value) { return sum + value; }, 0) || 1;
+        var targetValue = values[index] || 0;
+        var percent = Math.round((targetValue / total) * (progress || 1));
+        statusPercentEl.textContent = percent + "%";
+        statusLabelEl.textContent = labels[index] || "Status";
+    }
+
+    function renderStatusLegend(labels) {
+        statusLegendEl.innerHTML = labels.map(function (label, index) {
+            return (
+                '<span class="status-chart-legend-item">' +
+                '<span class="status-chart-legend-swatch" style="background-color: ' + statusColors[index] + ';"></span>' +
+                label +
+                '</span>'
+            );
+        }).join("");
+    }
+
+    var barLuxuryPlugin = {
+        id: "barLuxuryPlugin",
+        afterDatasetsDraw: function (chart) {
+            if (chart.canvas.id !== "categoryChart") {
+                return;
+            }
+
+            var ctx = chart.ctx;
+            var dataset = chart.data.datasets[0];
+            var meta = chart.getDatasetMeta(0);
+            var progress = chart._barProgress || 0;
+
+            ctx.save();
+            ctx.textAlign = "center";
+            ctx.textBaseline = "bottom";
+            ctx.font = "600 12px Segoe UI";
+            ctx.fillStyle = "rgba(255,255,255," + Math.max(progress, 0.15) + ")";
+
+            meta.data.forEach(function (bar, index) {
+                var value = dataset.data[index];
+                var props = bar.getProps(["x", "y", "base", "width"], true);
+                var labelValue = Math.round(value * progress);
+
+                ctx.shadowColor = "rgba(214,40,40,0.18)";
+                ctx.shadowBlur = 10;
+                ctx.fillText(labelValue, props.x, props.y - 10);
+            });
+            ctx.restore();
+        }
+    };
+
+    function renderRows(target, rows) {
+        if (!rows.length) {
+            target.innerHTML = '<tr><td colspan="3" class="text-center">Belum ada data.</td></tr>';
+            return;
+        }
+
+        target.innerHTML = rows.map(function (row) {
+            return (
+                "<tr>" +
+                "<td><div class='fw-semibold'>" + row.title + "</div><small>" + row.category + " - " + row.reporter_name + "</small></td>" +
+                "<td>" + row.location + "</td>" +
+                "<td>" + row.created_at + "</td>" +
+                "</tr>"
+            );
+        }).join("");
+    }
+
+    fetch("{% url 'dashboard_data' %}")
+        .then(function (response) { return response.json(); })
+        .then(function (data) {
+            console.log("Dashboard JSON:", data);
+
+            renderRows(reportedBody, data.latest_reported);
+            renderRows(resolvedBody, data.latest_resolved);
+
+            if (statusChart) {
+                statusChart.destroy();
+            }
+            if (categoryChart) {
+                categoryChart.destroy();
+            }
+
+            var rawStatusValues = data.status_distribution.values.map(function (value) {
+                var parsed = Number(value);
+                return Number.isFinite(parsed) && parsed > 0 ? parsed : 0;
+            });
+            var hasVisibleStatusData = rawStatusValues.some(function (value) {
+                return value > 0;
+            });
+            var statusValues = rawStatusValues.map(function (value) {
+                return value > 0 ? value : 0.0001;
+            });
+            var displayStatusValues = hasVisibleStatusData ? rawStatusValues : statusValues;
+
+            renderStatusLegend(data.status_distribution.labels);
+
+            statusChart = new Chart(statusCtx, {
+                type: "doughnut",
+                data: {
+                    labels: data.status_distribution.labels,
+                    datasets: [{
+                        data: statusValues,
+                        actualData: rawStatusValues,
+                        backgroundColor: statusColors,
+                        borderColor: "#ffffff",
+                        borderWidth: 3,
+                        hoverOffset: 12,
+                        spacing: 0,
+                        borderRadius: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    aspectRatio: 1,
+                    resizeDelay: 80,
+                    layout: {
+                        padding: {
+                            top: 6,
+                            right: 6,
+                            bottom: 6,
+                            left: 6
+                        }
+                    },
+                    cutout: "56%",
+                    animation: {
+                        duration: 1250,
+                        easing: "easeOutCubic",
+                        animateRotate: true,
+                        animateScale: true,
+                        onProgress: function (animation) {
+                            var progress = animation.currentStep / animation.numSteps;
+                            updateStatusCenter(
+                                animation.chart.data.labels,
+                                displayStatusValues,
+                                0,
+                                progress
+                            );
+                        },
+                        onComplete: function () {
+                            updateStatusCenter(this.data.labels, displayStatusValues, 0, 1);
+                        }
+                    },
+                    interaction: {
+                        mode: "nearest",
+                        intersect: false
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            backgroundColor: "rgba(15, 23, 42, 0.96)",
+                            titleColor: "#ffffff",
+                            bodyColor: "#e2e8f0",
+                            borderColor: "rgba(255, 255, 255, 0.08)",
+                            borderWidth: 1,
+                            padding: 12,
+                            displayColors: true,
+                            boxPadding: 6,
+                            callbacks: {
+                                label: function (context) {
+                                    var actualData = context.dataset.actualData || context.dataset.data;
+                                    var actualValue = actualData[context.dataIndex] || 0;
+                                    var total = actualData.reduce(function (sum, value) { return sum + value; }, 0) || 1;
+                                    var percent = Math.round((actualValue / total) * 100);
+                                    return context.label + ": " + actualValue + " (" + percent + "%)";
+                                }
+                            }
+                        }
+                    },
+                    onHover: function (event, elements, chart) {
+                        var index = elements.length ? elements[0].index : 0;
+                        updateStatusCenter(chart.data.labels, displayStatusValues, index, 1);
+                    }
+                }
+            });
+
+            categoryChart = new Chart(categoryCtx, {
+                type: "bar",
+                data: {
+                    labels: data.category_distribution.labels,
+                    datasets: [{
+                        label: "Jumlah Laporan",
+                        data: data.category_distribution.values,
+                        backgroundColor: function (context) {
+                            var chart = context.chart;
+                            var area = chart.chartArea;
+                            if (!area) {
+                                return "#dc3545";
+                            }
+                            var gradient = chart.ctx.createLinearGradient(0, area.bottom, 0, area.top);
+                            gradient.addColorStop(0, "#a71515");
+                            gradient.addColorStop(0.55, "#d62839");
+                            gradient.addColorStop(1, "#ff6b6b");
+                            return gradient;
+                        },
+                        borderRadius: 12,
+                        borderSkipped: false,
+                        hoverBackgroundColor: "#ff7a7a",
+                        hoverBorderColor: "rgba(255,255,255,0.22)",
+                        hoverBorderWidth: 1,
+                        barPercentage: 0.72,
+                        categoryPercentage: 0.76
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: {
+                        duration: 1650,
+                        easing: "easeOutCubic",
+                        delay: function (context) {
+                            return context.type === "data" ? context.dataIndex * 110 : 0;
+                        },
+                        onProgress: function (animation) {
+                            animation.chart._barProgress = animation.currentStep / animation.numSteps;
+                        },
+                        onComplete: function () {
+                            this._barProgress = 1;
+                        },
+                        y: {
+                            from: function () {
+                                return categoryCtx.height;
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            backgroundColor: "rgba(22, 22, 26, 0.96)",
+                            titleColor: "#ffffff",
+                            bodyColor: "#ffffff",
+                            borderColor: "rgba(255,255,255,0.08)",
+                            borderWidth: 1,
+                            padding: 12,
+                            displayColors: false
+                        }
+                    },
+                    scales: {
+                        x: {
+                            ticks: {
+                                color: "#ffffff"
+                            },
+                            grid: {
+                                color: "rgba(255,255,255,0.08)"
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                precision: 0,
+                                color: "#ffffff"
+                            },
+                            grid: {
+                                color: "rgba(255,255,255,0.08)"
+                            }
+                        }
+                    }
+                },
+                plugins: [barLuxuryPlugin]
+            });
+        })
+        .catch(function (error) {
+            console.error("Gagal memuat data dashboard:", error);
+            reportedBody.innerHTML = '<tr><td colspan="3" class="text-center">Data gagal dimuat.</td></tr>';
+            resolvedBody.innerHTML = '<tr><td colspan="3" class="text-center">Data gagal dimuat.</td></tr>';
+        });
+});
+</script>
+{% endblock %}
