@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'about',
     'contacts',
     'usermanagement_24782087',
+    'rest_framework',
 ]
 
 MIDDLEWARE = [

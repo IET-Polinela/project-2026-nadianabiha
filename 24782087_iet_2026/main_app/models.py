@@ -1,4 +1,14 @@
+from django.conf import settings
 from django.db import models
+
+
+STATUS_CHOICES = [
+    ('DRAFT', 'Draft'),
+    ('REPORTED', 'Reported'),
+    ('VERIFIED', 'Verified'),
+    ('IN_PROGRESS', 'In Progress'),
+    ('RESOLVED', 'Resolved'),
+]
 
 
 class Report(models.Model):
@@ -6,18 +16,20 @@ class Report(models.Model):
     STATUS_VERIFIED = "VERIFIED"
     STATUS_IN_PROGRESS = "IN_PROGRESS"
     STATUS_RESOLVED = "RESOLVED"
-    STATUS_CHOICES = [
-        (STATUS_REPORTED, "Reported"),
-        (STATUS_VERIFIED, "Verified"),
-        (STATUS_IN_PROGRESS, "In Progress"),
-        (STATUS_RESOLVED, "Resolved"),
-    ]
+    STATUS_CHOICES = STATUS_CHOICES
     STATUS_TRANSITIONS = {
         STATUS_REPORTED: STATUS_VERIFIED,
         STATUS_VERIFIED: STATUS_IN_PROGRESS,
         STATUS_IN_PROGRESS: STATUS_RESOLVED,
     }
 
+    reporter = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='reports',
+        null=True,
+        blank=True,
+    )
     reporter_name = models.CharField(max_length=100, default="Anonim")
     title = models.CharField(max_length=200)
     category = models.CharField(max_length=100)
@@ -29,6 +41,7 @@ class Report(models.Model):
         default=STATUS_REPORTED,
     )
     created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         ordering = ["-created_at"]
