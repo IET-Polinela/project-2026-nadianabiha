@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'contacts',
     'usermanagement_24782087',
     'rest_framework',
+    'rest_framework_simplejwt', # Tambahkan ini
 ]
 
 MIDDLEWARE = [
@@ -73,6 +74,15 @@ TEMPLATES = [
     },
 ]
 
+REST_FRAMEWORK = {
+    'DEFAULT_RENDERER_CLASSES': [
+        'rest_framework.renderers.JSONRenderer',
+        'rest_framework.renderers.BrowsableAPIRenderer'
+    ],
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    )
+}
 WSGI_APPLICATION = '24782087_iet_2026.wsgi.application'
 
 
