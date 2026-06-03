@@ -44,18 +44,23 @@ INSTALLED_APPS = [
     'contacts',
     'usermanagement_24782087',
     'rest_framework',
-    'rest_framework_simplejwt', # Tambahkan ini
+    'rest_framework_simplejwt',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',  #corsheaders harus diletakkan paling atas
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
+    'django.middleware.common.CommonMiddleware',  #atau di atas dari middleware ini
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+# CORS Settings
+CORS_ALLOW_ALL_ORIGINS = True  # Mengizinkan semua domain untuk mengakses API
 
 ROOT_URLCONF = '24782087_iet_2026.urls'
 
