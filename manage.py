@@ -1,3 +1,4 @@
+
 #!/usr/bin/env python
 """Project entrypoint from the repository root."""
 import os

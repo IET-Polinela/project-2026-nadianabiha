@@ -6,7 +6,94 @@
     <title>Portal Warga - Smart City Tracker</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    <style> body { background-color: #f4fcf9; } .spa-container { min-height: calc(100vh - 80px); } </style>
+    <style>
+        body { background-color: #eef7ff; }
+        .spa-container { min-height: calc(100vh - 80px); }
+        .dashboard-card { background: rgba(255,255,255,.92); border: 1px solid rgba(0,0,0,.05); }
+        .status-badge { min-width: 95px; }
+        .card-report { transition: transform .15s ease, box-shadow .15s ease; border-radius: 18px; }
+        .card-report:hover { transform: translateY(-2px); box-shadow: 0 16px 28px rgba(0,0,0,.08); }
+        .report-meta i { font-size: .95rem; }
+        .report-meta span { display: inline-flex; align-items: center; gap: .35rem; }
+        .btn-draft-edit { min-width: 110px; }
+        .draft-card { border-left: 4px solid #ffc107 !important; }
+        .progress-label {
+            font-size: .82rem;
+            color: #5b6b8a;
+        }
+
+        .custom-progress {
+            background-color: #e9ecef;
+            border-radius: 10px;
+            height: 8px;
+            overflow: hidden;
+            width: 100%;
+            min-height: 8px;
+        }
+
+        .custom-progress-bar {
+            border-radius: 10px 0 0 10px;
+            display: block;
+            height: 100%;
+            min-height: 8px;
+            transition: width 0.3s ease;
+            overflow: hidden;
+            box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.25);
+            position: relative;
+            transform: translateZ(0);
+        }
+
+        .progress-bar-draft {
+            background: linear-gradient(90deg, #6c757d 0%, #adb5bd 100%) !important;
+        }
+
+        .progress-bar-reported {
+            background: linear-gradient(90deg, #0dcaf0 0%, #66d9ff 100%) !important;
+        }
+
+        .progress-bar-verified {
+            background: linear-gradient(90deg, #0d6efd 0%, #5a8cff 100%) !important;
+        }
+
+        .progress-bar-in-progress {
+            background: linear-gradient(90deg, #ffc107 0%, #ffdf7e 100%) !important;
+        }
+
+        .progress-bar-resolved {
+            background: linear-gradient(90deg, #198754 0%, #6ec36b 100%) !important;
+        }
+
+        .custom-progress-bar::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image: repeating-linear-gradient(
+                45deg,
+                rgba(255, 255, 255, 0.85) 0,
+                rgba(255, 255, 255, 0.85) 10px,
+                rgba(255, 255, 255, 0.15) 10px,
+                rgba(255, 255, 255, 0.15) 20px
+            );
+            background-size: 20px 20px;
+            opacity: 0.9;
+            animation: progress-stripes 0.8s linear infinite;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        @keyframes progress-stripes {
+            from {
+                background-position: 0 0;
+            }
+            to {
+                background-position: 20px 0;
+            }
+        }
+
+        .sticky-top {
+            top: 20px !important;
+        }
+    </style>
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
@@ -18,6 +105,49 @@
 
     <main class="container-fluid px-4 mt-4 spa-container" id="app-content"></main>
 
+    <!-- Modal Form Laporan -->
+    <div class="modal fade" id="reportModal" tabindex="-1" aria-labelledby="reportModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title fw-bold" id="reportModalLabel"><i class="bi bi-pencil-square me-2"></i>Buat Laporan Baru</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <form id="reportForm">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Judul Laporan</label>
+                            <input type="text" id="reportTitle" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Kategori</label>
+                            <select id="reportCategory" class="form-select" required>
+                                <option value="Infrastruktur">Infrastruktur</option>
+                                <option value="Lalu Lintas">Lalu Lintas</option>
+                                <option value="Kebersihan">Kebersihan</option>
+                                <option value="Keamanan">Keamanan</option>
+                                <option value="Lainnya">Lainnya</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Lokasi Kejadian</label>
+                            <input type="text" id="reportLocation" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Deskripsi</label>
+                            <textarea id="reportDescription" class="form-control" rows="4" required></textarea>
+                        </div>
+                        <div class="d-flex justify-content-between mt-4">
+                            <button type="button" class="btn btn-outline-secondary fw-bold px-4" id="btnDraft">Simpan Draft</button>
+                            <button type="button" class="btn btn-primary fw-bold px-4" id="btnSubmit">Ajukan <i class="bi bi-send-fill ms-1"></i></button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="js/api.js"></script>
     <script src="js/auth.js"></script>
     <script src="js/app.js"></script>

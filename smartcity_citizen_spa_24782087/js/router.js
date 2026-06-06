@@ -25,25 +25,68 @@ const routes = {
     'dashboard': `
         <div class="row g-4">
             <aside class="col-12 col-lg-3">
-                <div class="card border-0 p-3 shadow-sm sticky-top" style="top: 20px;">
-                    <button class="btn btn-primary btn-lg w-100 fw-bold mb-3"><i class="bi bi-plus-circle-fill me-2"></i>Laporan Baru</button>
+                <div class="card dashboard-card p-3 shadow-sm sticky-top">
+                    <button class="btn btn-primary btn-lg w-100 fw-bold mb-4" onclick="new bootstrap.Modal(document.getElementById('reportModal')).show()">
+                        <i class="bi bi-plus-circle-fill me-2"></i>Laporan Baru
+                    </button>
+                    <h6 class="fw-bold mb-3"><i class="bi bi-bar-chart-fill text-primary me-2"></i>Rekap Status</h6>
+                    <ul class="list-group list-group-flush small">
+                        <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                            Draft <span class="badge bg-secondary rounded-pill px-3" id="countDraft">0</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                            Diproses <span class="badge bg-warning rounded-pill px-3" id="countDiproses">0</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                            Selesai <span class="badge bg-success rounded-pill px-3" id="countSelesai">0</span>
+                        </li>
+                    </ul>
                 </div>
             </aside>
-            <section class="col-12 col-lg-6">
-                <div class="card border-0 p-5 shadow-sm text-center text-muted border-dashed">
-                    <i class="bi bi-inbox fs-1"></i>
-                    <h5 class="mt-3">Selamat Datang!</h5>
-                    <p class="small">Koneksi API untuk data laporan akan diimplementasikan pada Lab 12.</p>
+            <section class="col-12 col-lg-8">
+                <div class="card dashboard-card border-0 shadow-sm p-3">
+                    <ul class="nav nav-pills mb-3" id="dashboardTabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#" id="tabMyReports"
+                               onclick="switchTab('my_reports'); return false;">
+                               <i class="bi bi-journal-text me-1"></i>Laporan Saya
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" id="tabFeed"
+                               onclick="switchTab('feed'); return false;">
+                               <i class="bi bi-globe me-1"></i>Feed Kota
+                            </a>
+                        </li>
+                    </ul>
+                    <div id="reportContainer">
+                        <div class="text-center py-5 text-muted">
+                            <div class="spinner-border" role="status"></div>
+                            <p class="mt-2">Memuat data...</p>
+                        </div>
+                    </div>
+                    <div id="paginationContainer" class="mt-3"></div>
                 </div>
             </section>
-            <aside class="col-12 col-lg-3 d-none d-lg-block">
-                <div class="card border-0 p-3 shadow-sm sticky-top" style="top: 20px;">
-                    <h6 class="fw-bold"><i class="bi bi-info-circle-fill text-primary me-2"></i>Pengumuman</h6>
-                </div>
-            </aside>
+            <aside class="col-12 col-lg-1 d-none d-xl-block"></aside>
         </div>
     `,
 };
+
+/**
+ * Fungsi untuk berpindah tab (Laporan Saya / Feed Kota)
+ */
+function switchTab(tab) {
+    currentTab = tab;
+    currentPage = 1;
+
+    // Update UI tab active state
+    document.getElementById('tabMyReports').classList.toggle('active', tab === 'my_reports');
+    document.getElementById('tabFeed').classList.toggle('active', tab === 'feed');
+
+    // Muat data sesuai tab
+    loadDashboardData(tab, 1);
+}
 
 /**
  * Fungsi utama untuk menangani perubahan rute (hash).
@@ -63,6 +106,12 @@ function handleRouting() {
     // Jika halaman login, jalankan setupLoginForm dari auth.js
     if (page === 'login' && typeof setupLoginForm === 'function') {
         setupLoginForm();
+    }
+
+    // Jika halaman dashboard, muat data laporan dari API
+    if (page === 'dashboard' && typeof loadDashboardData === 'function') {
+        loadDashboardData('my_reports', 1);
+        loadSummaryStats();
     }
 }
 
