@@ -85,7 +85,55 @@ cat server_smartcity/smartcity_app/settings.py | grep WSGI_APPLICATION
 
 > Catatan: `project_app` harus berada di jalur yang sama dengan `WorkingDirectory` di unit service Gunicorn.
 
-## 3. Langkah Verifikasi Lokal sebelum deployment
+## 3. Konfigurasi Lingkungan Terisolasi (Venv) & Database
+
+a. Masuk ke folder `server_smartcity` di dalam `project_app`.
+
+```bash
+cd /home/mhsXX/project_app/server_smartcity
+```
+
+b. Hapus virtual environment lama kalau ada, lalu buat ulang dengan Python 3:
+
+```bash
+rm -rf venv
+python3 -m venv venv
+```
+
+c. Aktifkan virtual environment dan pasang dependency dari `requirements.txt`:
+
+```bash
+source venv/bin/activate
+pip install --upgrade pip
+pip install -r ../requirements.txt
+```
+
+> Catatan: `requirements.txt` ada di root repository, bukan di dalam `server_smartcity`.
+
+d. Pastikan pengaturan database di `server_smartcity/smartcity_app/settings.py` menggunakan kredensial yang benar untuk server:
+
+```python
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'db_mhsXX',
+        'USER': 'user_mhsXX',
+        'PASSWORD': 'mhsXX',
+        'HOST': 'localhost',
+        'PORT': '5432',
+    }
+}
+```
+
+Jika kamu menggunakan environment variable di server, pastikan variabel tersebut diset sesuai.
+
+e. Jalankan migrasi untuk memastikan database terhubung:
+
+```bash
+python manage.py migrate
+```
+
+## 4. Langkah Verifikasi Lokal sebelum deployment
 
 Jalankan perintah berikut pada komputer lokal untuk memastikan semuanya siap:
 
