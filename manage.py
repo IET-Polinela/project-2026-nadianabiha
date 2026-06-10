@@ -9,7 +9,7 @@ from pathlib import Path
 def main():
     project_root = Path(__file__).resolve().parent / "24782087_iet_2026"
     sys.path.insert(0, str(project_root))
-    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "24782087_iet_2026.settings")
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "smartcity_app.settings")
 
     try:
         from django.core.management import execute_from_command_line

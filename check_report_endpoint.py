@@ -3,7 +3,7 @@ import sys
 import django
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '24782087_iet_2026'))
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', '24782087_iet_2026.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'smartcity_app.settings')
 django.setup()
 
 from django.test import Client

@@ -9,10 +9,11 @@ from .permissions import IsOwnerAndDraftOrReadOnly, IsCitizen
 class ReportPagination(PageNumberPagination):
     page_size = 10
     page_size_query_param = 'page_size'
-    max_page_size = 100
+    max_page_size = 1000
 
 
 class ReportViewSet(viewsets.ModelViewSet):
+    queryset = Report.objects.all().order_by('-updated_at')
     serializer_class = ReportSerializer
     pagination_class = ReportPagination
 
@@ -21,19 +22,17 @@ class ReportViewSet(viewsets.ModelViewSet):
         if not user.is_authenticated:
             return Report.objects.none()
 
-        queryset = Report.objects.all().order_by('-updated_at')
+        tab = self.request.query_params.get('tab')
+        base_queryset = self.queryset
 
-        tab = self.request.query_params.get('tab', None)
         if tab == 'my_reports':
-            queryset = queryset.filter(reporter=user)
-        elif tab == 'feed':
-            queryset = queryset.filter(~Q(reporter=user) & ~Q(status='DRAFT'))
-        else:
-            queryset = queryset.filter(
-                ~Q(status='DRAFT') | Q(status='DRAFT', reporter=user)
-            )
+            return base_queryset.filter(reporter=user)
 
-        return queryset
+        if tab == 'feed':
+            return base_queryset.filter(~Q(status='DRAFT')).exclude(reporter=user)
+
+        # Default: semua laporan non-DRAFT ditampilkan, plus DRAFT milik user sendiri
+        return base_queryset.filter(Q(status='DRAFT', reporter=user) | ~Q(status='DRAFT'))
 
     def get_permissions(self):
         if self.action == 'create':
