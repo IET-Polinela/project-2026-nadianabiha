@@ -28,8 +28,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 CORS_ALLOW_ALL_ORIGINS = True
-CSRF_TRUSTED_ORIGINS = ['http://103.151.63.88:8005']
-STATIC_ROOT = '/tmp/smartcity_static'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 
 # Application definition
