@@ -2,7 +2,7 @@ import os
 import sys
 import django
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '24782087_iet_2026'))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'server_smartcity'))
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'smartcity_app.settings')
 django.setup()
 

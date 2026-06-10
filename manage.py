@@ -7,7 +7,7 @@ from pathlib import Path
 
 
 def main():
-    project_root = Path(__file__).resolve().parent / "24782087_iet_2026"
+    project_root = Path(__file__).resolve().parent / "server_smartcity"
     sys.path.insert(0, str(project_root))
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "smartcity_app.settings")
 
