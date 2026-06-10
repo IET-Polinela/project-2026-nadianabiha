@@ -109,23 +109,18 @@ python manage.py migrate
 
 ## 4. Mengaktifkan Gunicorn
 
-a. Kumpulkan file statis DRF:
+a. Kumpulkan file statis DRF (tanpa perlu sudo):
 
 ```bash
 python manage.py collectstatic --noinput
 ```
 
-b. Verifikasi status Gunicorn:
+b. Jika Gunicorn belum aktif, minta administrator server untuk restart service:
 
-```bash
-systemctl status gunicorn-mhsXX
-```
+> Administrator, jalankan perintah berikut:
+> ```bash
+> sudo systemctl restart gunicorn-mhsXX
+> sudo systemctl reload nginx
+> ```
 
-Harusnya status menunjukkan `active (running)` dan berwarna hijau.
-
-c. Jika perlu restart, informasikan ke administrator server untuk menjalankan:
-
-```bash
-sudo systemctl restart gunicorn-mhsXX
-sudo systemctl reload nginx
-```
+Setelah administrator selesai, Gunicorn akan aktif dan siap melayani request.
