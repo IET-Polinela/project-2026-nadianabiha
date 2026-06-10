@@ -28,7 +28,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 CORS_ALLOW_ALL_ORIGINS = True
-STATIC_ROOT = BASE_DIR / 'staticfiles'
+CSRF_TRUSTED_ORIGINS = ['http://103.151.63.88:8005']
+STATIC_ROOT = '/tmp/smartcity_static'
 
 
 # Application definition
@@ -90,6 +91,7 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     )
 }
+
 WSGI_APPLICATION = 'smartcity_app.wsgi.application'
 
 
