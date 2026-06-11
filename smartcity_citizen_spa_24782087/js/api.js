@@ -3,7 +3,7 @@
 // Berisi fungsi helper untuk berkomunikasi dengan Backend Django
 // ============================================================
 
-const API_BASE_URL = 'http://127.0.0.1:8000'; // Base URL backend Django
+const API_BASE_URL = 'http://103.151.63.88:8005'; // Base URL backend Django (Server Public IP)
 
 /**
  * Fungsi utama untuk melakukan request ke API Backend.
