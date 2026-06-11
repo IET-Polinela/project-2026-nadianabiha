@@ -1,39 +1,33 @@
 name: Deploy Frontend SPA to GitHub Pages
-
 on:
   push:
-    branches: [ main ]
+    branches: ["main", "master"]
+  workflow_dispatch:
 
 permissions:
   contents: read
   pages: write
   id-token: write
 
-concurrency:
-  group: pages
-  cancel-in-progress: false
-
 jobs:
   deploy:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-    
     runs-on: ubuntu-latest
-    
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
-      
+
       - name: Setup Pages
         uses: actions/configure-pages@v4
-      
+
       - name: Upload artifact (Hanya Folder Frontend)
         uses: actions/upload-pages-artifact@v3
         with:
-          # Sudah diperbaiki agar membaca folder pembungkus terluar
-          path: './24782087_iet_2026/smartcity_citizen_spa_24782087'
-      
+          # Ini path yang 100% benar sesuai gambar root repository Nadia
+          path: './smartcity_citizen_spa_24782087'
+
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
