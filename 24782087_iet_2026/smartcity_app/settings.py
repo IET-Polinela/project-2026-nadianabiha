@@ -26,9 +26,7 @@ SECRET_KEY = 'django-insecure-3=l76hea2^x7@crd4y&q&-_x05=6%6mi99!-d4ri*ekxpm4%i(
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']
-CORS_ALLOW_ALL_ORIGINS = True
-STATIC_ROOT = BASE_DIR / 'staticfiles'
+ALLOWED_HOSTS = []
 
 
 # Application definition
@@ -64,7 +62,7 @@ MIDDLEWARE = [
 # CORS Settings
 CORS_ALLOW_ALL_ORIGINS = True  # Mengizinkan semua domain untuk mengakses API
 
-ROOT_URLCONF = 'smartcity_app.urls'
+ROOT_URLCONF = '24782087_iet_2026.urls'
 
 TEMPLATES = [
     {
@@ -90,7 +88,7 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     )
 }
-WSGI_APPLICATION = 'smartcity_app.wsgi.application'
+WSGI_APPLICATION = '24782087_iet_2026.wsgi.application'
 
 
 # Database
