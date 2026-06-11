@@ -28,10 +28,11 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v4
       
-      - name: Upload artifacts (Mauna Folder Frontend)
+      - name: Upload artifact (Hanya Folder Frontend)
         uses: actions/upload-pages-artifact@v3
         with:
-          path: './smartcity_citizen_spa_24782087'
+          # Sudah diperbaiki agar membaca folder pembungkus terluar
+          path: './24782087_iet_2026/smartcity_citizen_spa_24782087'
       
       - name: Deploy to GitHub Pages
         id: deployment
