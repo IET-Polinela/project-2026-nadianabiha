@@ -1,6 +1,7 @@
 from django.db.models import Q
 from rest_framework import viewsets, permissions
 from rest_framework.pagination import PageNumberPagination
+from drf_spectacular.utils import extend_schema
 from .models import Report
 from .serializers import ReportSerializer
 from .permissions import IsOwnerAndDraftOrReadOnly, IsCitizen
@@ -40,6 +41,9 @@ class ReportViewSet(viewsets.ModelViewSet):
         if self.action in ['update', 'partial_update', 'destroy']:
             return [permissions.IsAuthenticated(), IsOwnerAndDraftOrReadOnly()]
         return [permissions.IsAuthenticated()]
+
+    def create(self, request, *args, **kwargs):
+        return super().create(request, *args, **kwargs)
 
     def perform_create(self, serializer):
         serializer.save(reporter=self.request.user)

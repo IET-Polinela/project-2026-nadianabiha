@@ -47,6 +47,8 @@ INSTALLED_APPS = [
     'usermanagement_24782087',
     'rest_framework',
     'rest_framework_simplejwt',
+    'drf_spectacular',
+    'django_scalar',
     'corsheaders',
 ]
 
@@ -86,10 +88,32 @@ REST_FRAMEWORK = {
         'rest_framework.renderers.JSONRenderer',
         'rest_framework.renderers.BrowsableAPIRenderer'
     ],
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     )
 }
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Smart City Portal API',
+    'DESCRIPTION': 'Dokumentasi REST API resmi untuk Portal Pelaporan Laporan Warga',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    'SECURITY': [
+        {
+            'BearerAuth': []
+        }
+    ],
+    'SECURITY_DEFINITIONS': {
+        'BearerAuth': {
+            'type': 'http',
+            'scheme': 'bearer',
+            'bearerFormat': 'JWT',
+        }
+    },
+    'COMPONENT_SPLIT_REQUEST': True,
+}
+
 WSGI_APPLICATION = 'smartcity_app.wsgi.application'
 
 
