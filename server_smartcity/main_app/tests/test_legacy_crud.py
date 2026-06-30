@@ -1,10 +1,23 @@
+from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
 
-from .models import Report
+from main_app.models import Report
 
 
 class ReportCrudTests(TestCase):
+    def setUp(self):
+        User = get_user_model()
+        User.objects.create_user(
+            username="admin_test",
+            password="AdminPass123!",
+            is_admin=True,
+            is_staff=True,
+        )
+
+    def login_admin(self):
+        self.client.login(username="admin_test", password="AdminPass123!")
+
     def test_report_list_page_shows_reports(self):
         report = Report.objects.create(
             reporter_name="Nabiha",
@@ -14,12 +27,14 @@ class ReportCrudTests(TestCase):
             location="Jl. Sudirman",
         )
 
+        self.login_admin()
         response = self.client.get(reverse("report_list"))
 
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, report.title)
 
     def test_add_report_creates_record(self):
+        self.login_admin()
         response = self.client.post(
             reverse("add_report"),
             {
@@ -44,6 +59,7 @@ class ReportCrudTests(TestCase):
             location="Jl. Melati",
         )
 
+        self.login_admin()
         response = self.client.post(
             reverse("update_report", args=[report.id]),
             {
@@ -71,6 +87,7 @@ class ReportCrudTests(TestCase):
             location="Jl. Diponegoro",
         )
 
+        self.login_admin()
         response = self.client.post(reverse("delete_report", args=[report.id]))
 
         self.assertRedirects(response, reverse("report_list"))
@@ -85,6 +102,7 @@ class ReportCrudTests(TestCase):
             location="Taman Kota",
         )
 
+        self.login_admin()
         response = self.client.post(
             reverse("update_report_status", args=[report.id]),
             {"status": Report.STATUS_VERIFIED},

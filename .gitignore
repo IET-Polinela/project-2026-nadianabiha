@@ -1,0 +1,15 @@
+.codex_work/
+lab15_deliverables/
+node_modules/
+playwright-report/
+test-results/
+server_smartcity/.coverage
+server_smartcity/htmlcov/
+__pycache__/
+*.py[cod]
+debug.log
+*.log
+*.err
+.env
+.venv/
+venv/

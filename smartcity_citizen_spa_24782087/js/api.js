@@ -42,5 +42,12 @@ async function requestAPI(endpoint, method = 'GET', bodyData = null) {
 
     // Lakukan fetch request
     const response = await fetch(url, options);
+    if (response.status === 401) {
+        localStorage.removeItem('access_token');
+        localStorage.removeItem('refresh_token');
+        localStorage.removeItem('username');
+        alert('Sesi Anda telah habis atau Anda belum login.');
+        window.location.hash = '#login';
+    }
     return response;
 }

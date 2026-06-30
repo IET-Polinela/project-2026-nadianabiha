@@ -12,6 +12,7 @@ class ReportForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         for field in self.fields.values():
             field.widget.attrs["class"] = "form-control"
+        self.fields["reporter_name"].required = False
         self.fields["reporter_name"].widget.attrs["placeholder"] = "Masukkan nama pelapor"
         self.fields["title"].widget.attrs["placeholder"] = "Masukkan judul laporan"
         self.fields["category"].widget.attrs["placeholder"] = "Contoh: Jalan rusak"
@@ -30,6 +31,7 @@ class ReportUpdateForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         for field in self.fields.values():
             field.widget.attrs["class"] = "form-control"
+        self.fields["reporter_name"].required = False
         self.fields["reporter_name"].widget.attrs["placeholder"] = "Masukkan nama pelapor"
         self.fields["title"].widget.attrs["placeholder"] = "Masukkan judul laporan"
         self.fields["category"].widget.attrs["placeholder"] = "Contoh: Jalan rusak"

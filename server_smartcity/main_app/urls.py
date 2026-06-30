@@ -16,6 +16,7 @@ urlpatterns = [
     path("", HomePageView.as_view(), name="home"),
     path("reports/", ReportListView.as_view(), name="report_list"),
     path("reports/search/", ReportSearchAPIView.as_view(), name="report_search"),
+    path("search/", ReportSearchAPIView.as_view(), name="report_search_alias"),
     path("reports/<int:pk>/json/", ReportDetailAPIView.as_view(), name="report_detail_json"),
     path("reports/add/", ReportCreateView.as_view(), name="add_report"),
     path("reports/<int:pk>/", ReportDetailView.as_view(), name="report_detail"),

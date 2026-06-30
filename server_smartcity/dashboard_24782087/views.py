@@ -1,16 +1,24 @@
 from django.db.models import Count
 from django.http import JsonResponse
+from django.shortcuts import redirect
 from django.views import View
 from django.views.generic import TemplateView
 
 from main_app.models import Report
 
 
-class DashboardPageView(TemplateView):
+class AdminRequiredMixin:
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated or not getattr(request.user, "is_admin", False):
+            return redirect("report_list")
+        return super().dispatch(request, *args, **kwargs)
+
+
+class DashboardPageView(AdminRequiredMixin, TemplateView):
     template_name = "dashboard_24782087/dashboard.html"
 
 
-class DashboardDataAPIView(View):
+class DashboardDataAPIView(AdminRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         status_labels = dict(Report.STATUS_CHOICES)
         status_counts = {
@@ -65,4 +73,3 @@ class DashboardDataAPIView(View):
                 "latest_resolved": [serialize_report(report) for report in latest_resolved],
             }
         )
-

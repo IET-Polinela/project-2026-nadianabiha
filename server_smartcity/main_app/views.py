@@ -1,5 +1,5 @@
 from django.contrib import messages
-from django.http import JsonResponse
+from django.http import HttpResponseForbidden, JsonResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.db.models import Q
 from django.urls import reverse, reverse_lazy
@@ -31,13 +31,18 @@ class HomePageView(TemplateView):
         return context
 
 
-class ReportListView(ListView):
+class ReportListView(AdminRequiredMixin, ListView):
     model = Report
     template_name = "main_app/report_page.html"
     context_object_name = "reports"
 
 
-class ReportSearchAPIView(View):
+class ReportSearchAPIView(AdminRequiredMixin, View):
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated or not getattr(request.user, "is_admin", False):
+            return HttpResponseForbidden("Akses Ditolak. Fitur ini hanya untuk admin.")
+        return super().dispatch(request, *args, **kwargs)
+
     def get(self, request, *args, **kwargs):
         query = request.GET.get("q", "").strip()
         reports = Report.objects.all()
@@ -102,7 +107,7 @@ class ReportDetailAPIView(View):
         )
 
 
-class ReportDetailView(DetailView):
+class ReportDetailView(AdminRequiredMixin, DetailView):
     model = Report
     template_name = "main_app/report_detail.html"
     context_object_name = "report"
@@ -167,3 +172,7 @@ class ReportUpdateStatusView(AdminRequiredMixin, View):
             messages.error(request, "Perubahan status tidak sesuai alur workflow.")
 
         return redirect("report_list")
+
+
+def report_detail_api(request, pk):
+    return ReportDetailAPIView.as_view()(request, pk=pk)

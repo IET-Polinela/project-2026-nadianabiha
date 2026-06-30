@@ -1,0 +1,13 @@
+{
+  "name": "smartcity-lab15-tests",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "test": "powershell -ExecutionPolicy Bypass -File ./scripts/run-playwright-lab15.ps1",
+    "test:e2e": "playwright test",
+    "test:e2e:headed": "playwright test --headed"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.55.0"
+  }
+}

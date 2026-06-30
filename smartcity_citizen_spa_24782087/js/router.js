@@ -26,11 +26,11 @@ const routes = {
         <div class="row g-4">
             <aside class="col-12 col-lg-3">
                 <div class="card dashboard-card p-3 shadow-sm sticky-top">
-                    <button class="btn btn-primary btn-lg w-100 fw-bold mb-4" onclick="new bootstrap.Modal(document.getElementById('reportModal')).show()">
+                    <button id="btnBukaModal" class="btn btn-primary btn-lg w-100 fw-bold mb-4" onclick="showReportModal()">
                         <i class="bi bi-plus-circle-fill me-2"></i>Laporan Baru
                     </button>
                     <h6 class="fw-bold mb-3"><i class="bi bi-bar-chart-fill text-primary me-2"></i>Rekap Status</h6>
-                    <ul class="list-group list-group-flush small">
+                    <ul id="summaryStats" class="list-group list-group-flush small">
                         <li class="list-group-item d-flex justify-content-between align-items-center px-0">
                             Draft <span class="badge bg-secondary rounded-pill px-3" id="countDraft">0</span>
                         </li>
@@ -53,16 +53,18 @@ const routes = {
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#" id="tabFeed"
+                            <a class="nav-link" href="#" id="tabFeedKota"
                                onclick="switchTab('feed'); return false;">
                                <i class="bi bi-globe me-1"></i>Feed Kota
                             </a>
                         </li>
                     </ul>
-                    <div id="reportContainer">
-                        <div class="text-center py-5 text-muted">
-                            <div class="spinner-border" role="status"></div>
-                            <p class="mt-2">Memuat data...</p>
+                    <div id="listContainer">
+                        <div id="reportContainer">
+                            <div class="text-center py-5 text-muted">
+                                <div class="spinner-border" role="status"></div>
+                                <p class="mt-2">Memuat data...</p>
+                            </div>
                         </div>
                     </div>
                     <div id="paginationContainer" class="mt-3"></div>
@@ -82,7 +84,7 @@ function switchTab(tab) {
 
     // Update UI tab active state
     document.getElementById('tabMyReports').classList.toggle('active', tab === 'my_reports');
-    document.getElementById('tabFeed').classList.toggle('active', tab === 'feed');
+    document.getElementById('tabFeedKota').classList.toggle('active', tab === 'feed');
 
     // Muat data sesuai tab
     loadDashboardData(tab, 1);
@@ -96,6 +98,17 @@ function switchTab(tab) {
 function handleRouting() {
     const hash = window.location.hash || '#login'; // Default ke login
     const page = hash.replace('#', '');
+    const hasAccessToken = Boolean(localStorage.getItem('access_token'));
+
+    if (page === 'dashboard' && !hasAccessToken) {
+        window.location.hash = '#login';
+        return;
+    }
+
+    if (page === 'login' && hasAccessToken) {
+        window.location.hash = '#dashboard';
+        return;
+    }
 
     // Ambil HTML dari objek routes, default ke halaman login
     const html = routes[page] || routes['login'];

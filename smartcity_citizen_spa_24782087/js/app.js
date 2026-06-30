@@ -276,10 +276,10 @@ async function editDraft(id) {
             const report = await response.json();
 
             // Isi form dengan data lama
-            document.getElementById('reportTitle').value = report.title;
-            document.getElementById('reportCategory').value = report.category;
-            document.getElementById('reportLocation').value = report.location;
-            document.getElementById('reportDescription').value = report.description;
+            document.getElementById('inputTitle').value = report.title;
+            document.getElementById('inputCategory').value = report.category;
+            document.getElementById('inputLocation').value = report.location;
+            document.getElementById('inputDescription').value = report.description;
 
             // Set global ID
             editingReportId = id;
@@ -289,8 +289,7 @@ async function editDraft(id) {
             if (modalLabel) modalLabel.innerHTML = '<i class="bi bi-pencil-square me-2"></i>Edit Draft Laporan';
 
             // Tampilkan modal
-            const myModal = new bootstrap.Modal(document.getElementById('reportModal'));
-            myModal.show();
+            showReportModal();
         }
     } catch (error) {
         console.error('Error saat mengambil detail report:', error);
@@ -305,10 +304,10 @@ function setupReportForm() {
     const btnSubmit = document.getElementById('btnSubmit');
 
     const submitHandler = async (status) => {
-        const title = document.getElementById('reportTitle').value;
-        const category = document.getElementById('reportCategory').value;
-        const location = document.getElementById('reportLocation').value;
-        const description = document.getElementById('reportDescription').value;
+        const title = document.getElementById('inputTitle').value;
+        const category = document.getElementById('inputCategory').value;
+        const location = document.getElementById('inputLocation').value;
+        const description = document.getElementById('inputDescription').value;
 
         if (!title || !category || !location || !description) {
             alert('Semua field harus diisi!');
@@ -333,11 +332,7 @@ function setupReportForm() {
                 alert(status === 'DRAFT' ? 'Draft berhasil disimpan!' : 'Laporan berhasil diajukan!');
 
                 // Tutup modal
-                const modalElement = document.getElementById('reportModal');
-                const modalInstance = bootstrap.Modal.getInstance(modalElement);
-                if (modalInstance) {
-                    modalInstance.hide();
-                }
+                hideReportModal();
 
                 // Reset form dan ID
                 document.getElementById('reportForm').reset();
@@ -378,6 +373,39 @@ function setupReportForm() {
             if (modalLabel) modalLabel.innerHTML = '<i class="bi bi-pencil-square me-2"></i>Buat Laporan Baru';
         });
     }
+}
+
+function showReportModal() {
+    const modalElement = document.getElementById('reportModal');
+    if (!modalElement) return;
+
+    if (window.bootstrap && bootstrap.Modal) {
+        bootstrap.Modal.getOrCreateInstance(modalElement).show();
+        return;
+    }
+
+    modalElement.classList.add('show');
+    modalElement.removeAttribute('aria-hidden');
+    modalElement.setAttribute('aria-modal', 'true');
+    modalElement.style.display = 'block';
+}
+
+function hideReportModal() {
+    const modalElement = document.getElementById('reportModal');
+    if (!modalElement) return;
+
+    if (window.bootstrap && bootstrap.Modal) {
+        const modalInstance = bootstrap.Modal.getInstance(modalElement);
+        if (modalInstance) {
+            modalInstance.hide();
+            return;
+        }
+    }
+
+    modalElement.classList.remove('show');
+    modalElement.setAttribute('aria-hidden', 'true');
+    modalElement.removeAttribute('aria-modal');
+    modalElement.style.display = 'none';
 }
 
 document.addEventListener('DOMContentLoaded', function () {
