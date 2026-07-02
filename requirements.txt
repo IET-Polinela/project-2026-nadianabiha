@@ -1,12 +1,15 @@
 asgiref==3.11.1
 Django==6.0.5
 django-cors-headers==4.9.0
+django-scalar==0.2.0
 djangorestframework==3.17.1
 djangorestframework_simplejwt==5.5.1
+drf-spectacular==0.29.0
 coverage==7.10.6
 psycopg==3.3.4
 psycopg-binary==3.3.4
 PyJWT==2.12.1
+PyYAML==6.0.3
 sqlparse==0.5.5
 tzdata==2026.2
 gunicorn
